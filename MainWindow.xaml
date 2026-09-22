@@ -1,0 +1,606 @@
+<Window x:Class="Kombos.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Κόμβος — Claude &amp; η ομάδα agents"
+        Height="840" Width="1200" MinHeight="600" MinWidth="820"
+        Background="Transparent"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        ResizeMode="CanResize"
+        FontFamily="Segoe UI"
+        Icon="kombos.ico"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True"
+        Loaded="Window_Loaded"
+        StateChanged="MainWindow_StateChanged"
+        Closing="MainWindow_Closing"
+        PreviewKeyDown="MainWindow_PreviewKeyDown">
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="32" ResizeBorderThickness="6" GlassFrameThickness="0" CornerRadius="0" UseAeroCaptionButtons="False"/>
+    </WindowChrome.WindowChrome>
+
+    <Border x:Name="AppShellBorder" CornerRadius="8" ClipToBounds="True">
+        <Border.Effect>
+            <DropShadowEffect Color="Black" BlurRadius="18" ShadowDepth="0" Opacity="0.35"/>
+        </Border.Effect>
+
+        <Grid x:Name="RootGrid" Background="{DynamicResource PaperBrush}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="32"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition x:Name="Col0" Width="56"/>
+                <ColumnDefinition x:Name="Col1" Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Custom title bar (WindowStyle=None απαιτεί δικό μας chrome για να δουλέψει η διαφάνεια παραθύρου) -->
+            <Border x:Name="CustomTitleBar" Grid.Row="0" Grid.ColumnSpan="2" Background="{DynamicResource SidebarBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel x:Name="TitleBarBrand" Orientation="Horizontal" Margin="10,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left">
+                        <Image Source="kombos.ico" Width="16" Height="16" Margin="0,0,8,0"/>
+                        <TextBlock x:Name="CustomTitleText" Foreground="White" FontSize="12" FontFamily="Bahnschrift" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" WindowChrome.IsHitTestVisibleInChrome="True">
+                        <Button x:Name="MinimizeButton" Content="&#x2013;" Width="42" Height="32" FontSize="14"
+                                Background="Transparent" Foreground="White" BorderThickness="0" Cursor="Hand" Click="MinimizeButton_Click"
+                                AutomationProperties.Name="Ελαχιστοποίηση"/>
+                        <Button x:Name="MaximizeButton" Content="&#x25A1;" Width="42" Height="32" FontSize="11"
+                                Background="Transparent" Foreground="White" BorderThickness="0" Cursor="Hand" Click="MaximizeButton_Click"
+                                AutomationProperties.Name="Μεγιστοποίηση"/>
+                        <Button x:Name="CloseButton" Content="&#x2715;" Width="42" Height="32" FontSize="11"
+                                Background="Transparent" Foreground="White" BorderThickness="0" Cursor="Hand" Click="CloseButton_Click"
+                                AutomationProperties.Name="Κλείσιμο"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Classic μενού (μόνο για το skin "Windows Classic" - αντικαθιστά την πλευρική μπάρα εικονιδίων
+                 με ένα παραδοσιακό οριζόντιο μενού File/Edit/View/Tools/Help, ακριβώς όπως ήταν τότε). Κρυφό
+                 από προεπιλογή (Auto row -> ύψος 0 όταν Collapsed), εμφανίζεται μόνο μέσω ApplySkinChrome(). -->
+            <Menu x:Name="ClassicMenuBar" Grid.Row="1" Grid.ColumnSpan="2" Visibility="Collapsed"
+                  Background="#C0C0C0" Foreground="Black" FontSize="12">
+                <MenuItem x:Name="ClassicFileMenu" Header="_Αρχείο">
+                    <MenuItem x:Name="ClassicNewChatMenuItem" Header="_Νέα συζήτηση" Click="NewChatButton_Click"/>
+                    <Separator/>
+                    <MenuItem x:Name="ClassicExitMenuItem" Header="Έ_ξοδος" Click="ClassicExitMenuItem_Click"/>
+                </MenuItem>
+                <MenuItem x:Name="ClassicEditMenu" Header="Επεξεργασία">
+                    <MenuItem x:Name="ClassicAgentSettingsMenuItem" Header="Ρυθμίσεις _Agent..." Click="ClassicAgentSettingsMenuItem_Click"/>
+                    <MenuItem x:Name="ClassicAppSettingsMenuItem" Header="Ρυθμίσεις _εφαρμογής..." Click="SettingsGearButton_Click"/>
+                </MenuItem>
+                <MenuItem x:Name="ClassicViewMenu" Header="_Προβολή">
+                    <MenuItem x:Name="ClassicThemeMenuItem" Header="Light / _Dark mode" Click="ThemeToggleButton_Click"/>
+                    <MenuItem x:Name="ClassicLangMenuItem" Header="_Γλώσσα..." Click="LangToggleButton_Click"/>
+                    <MenuItem x:Name="ClassicAppearanceMenuItem" Header="Ε_μφάνιση / Skins..." Click="AppearanceButton_Click"/>
+                    <MenuItem x:Name="ClassicFocusModeMenuItem" Header="Λειτουργία _εστίασης  F11" Click="ClassicFocusModeMenuItem_Click"/>
+                </MenuItem>
+                <MenuItem x:Name="ClassicToolsMenu" Header="Ερ_γαλεία">
+                    <MenuItem x:Name="ClassicCommandPaletteMenuItem" Header="_Γρήγορη εντολή...  Ctrl+K" Click="ClassicCommandPaletteMenuItem_Click"/>
+                    <MenuItem x:Name="ClassicArtifactsMenuItem" Header="_Artifacts..." Click="ArtifactsButton_Click"/>
+                    <MenuItem x:Name="ClassicHistoryMenuItem" Header="_Συζητήσεις..." Click="ProjectsSidebarButton_Click"/>
+                </MenuItem>
+                <MenuItem x:Name="ClassicHelpMenu" Header="_Βοήθεια">
+                    <MenuItem x:Name="ClassicHelpMenuItem" Header="_Βοήθεια..." Click="ClassicHelpMenuItem_Click"/>
+                </MenuItem>
+            </Menu>
+
+            <!-- Sidebar -->
+            <Border x:Name="SidebarBorder" Grid.Row="2" Grid.Column="0" Background="{DynamicResource SidebarBrush}">
+                <StackPanel VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,18,0,0">
+                    <Border x:Name="AvatarBorder" Width="30" Height="30"
+                            Cursor="Hand" MouseLeftButtonUp="AvatarBorder_Click" ToolTip="Ρυθμίσεις agents / login"/>
+                    <Button x:Name="ThemeToggleButton" Content="&#127769;" Width="34" Height="34" Margin="0,26,0,6"
+                            Click="ThemeToggleButton_Click" ToolTip="Εναλλαγή Light / Dark mode"
+                            Background="Transparent" Foreground="White" BorderThickness="0" FontSize="16" Cursor="Hand"/>
+                    <Button x:Name="LangToggleButton" Content="&#127760;" Width="34" Height="34"
+                            Click="LangToggleButton_Click" ToolTip="Επιλογή γλώσσας"
+                            Background="Transparent" Foreground="White" BorderThickness="0" FontSize="16" Cursor="Hand"/>
+                    <Button x:Name="AppearanceButton" Content="&#127912;" Width="34" Height="34" Margin="0,6,0,0"
+                            Click="AppearanceButton_Click" ToolTip="Εμφάνιση / θέματα / skins"
+                            Background="Transparent" Foreground="White" BorderThickness="0" FontSize="16" Cursor="Hand"/>
+                    <Button x:Name="ArtifactsButton" Content="&#129513;" Width="34" Height="34" Margin="0,6,0,0"
+                            Click="ArtifactsButton_Click" ToolTip="Artifacts - μπλοκ κώδικα από όλες τις συζητήσεις"
+                            Background="Transparent" Foreground="White" BorderThickness="0" FontSize="16" Cursor="Hand"/>
+                    <Button x:Name="ProjectsSidebarButton" Content="&#128193;" Width="34" Height="34" Margin="0,6,0,0"
+                            Click="ProjectsSidebarButton_Click" ToolTip="Projects &amp; Συζητήσεις - τρέχουσες και παλαιότερες"
+                            Background="Transparent" Foreground="White" BorderThickness="0" FontSize="16" Cursor="Hand"/>
+                    <Button x:Name="SettingsGearButton" Content="&#9881;" Width="34" Height="34" Margin="0,6,0,0"
+                            Click="SettingsGearButton_Click" ToolTip="Ρυθμίσεις εφαρμογής"
+                            Background="Transparent" Foreground="White" BorderThickness="0" FontSize="16" Cursor="Hand"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Main content -->
+            <Grid x:Name="MainContentGrid" Grid.Row="2" Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition x:Name="HeaderRowDef" Height="Auto"/>
+                    <RowDefinition x:Name="ChatRowDef" Height="260"/>
+                    <RowDefinition x:Name="TabsRowDef" Height="Auto"/>
+                    <RowDefinition x:Name="TilesRowDef" Height="*"/>
+                    <RowDefinition x:Name="StatusRowDef" Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <Grid x:Name="HeaderRow" Grid.Row="0">
+                    <Border x:Name="HeaderGlow" Visibility="Collapsed" VerticalAlignment="Stretch"
+                            RenderTransformOrigin="0.5,0.5" Opacity="0.75">
+                        <Border.RenderTransform>
+                            <TranslateTransform x:Name="HeaderGlowShift" X="0"/>
+                        </Border.RenderTransform>
+                        <Border.Triggers>
+                            <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="HeaderGlowShift" Storyboard.TargetProperty="X"
+                                                         From="-60" To="60" Duration="0:0:6" AutoReverse="True" RepeatBehavior="Forever"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </Border.Triggers>
+                        <Border.Background>
+                            <RadialGradientBrush>
+                                <GradientStop Color="#60C1633A" Offset="0"/>
+                                <GradientStop Color="#00C1633A" Offset="1"/>
+                            </RadialGradientBrush>
+                        </Border.Background>
+                    </Border>
+                    <Canvas x:Name="HeaderParticles" Visibility="Collapsed" VerticalAlignment="Stretch" ClipToBounds="True"/>
+                    <StackPanel Margin="24,20,24,10">
+                        <StackPanel Orientation="Horizontal">
+                            <Canvas Width="26" Height="26" Margin="0,0,8,0" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                                <Canvas.RenderTransform>
+                                    <RotateTransform x:Name="TitleIconRotate" Angle="0"/>
+                                </Canvas.RenderTransform>
+                                <Canvas.Triggers>
+                                    <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetName="TitleIconRotate" Storyboard.TargetProperty="Angle"
+                                                                 From="0" To="360" Duration="0:0:7" RepeatBehavior="Forever"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </Canvas.Triggers>
+                                <Line X1="13" Y1="13" X2="13" Y2="3" Stroke="{DynamicResource ClaudeBrush}" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                                <Line X1="13" Y1="13" X2="21" Y2="18" Stroke="{DynamicResource ClaudeBrush}" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                                <Line X1="13" Y1="13" X2="5" Y2="18" Stroke="{DynamicResource ClaudeBrush}" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                                <Ellipse Canvas.Left="9.5" Canvas.Top="9.5" Width="7" Height="7" Fill="{DynamicResource ClaudeBrush}"/>
+                                <Ellipse Canvas.Left="10" Canvas.Top="0" Width="6" Height="6" Fill="{DynamicResource ClaudeBrush}"/>
+                                <Ellipse Canvas.Left="18" Canvas.Top="15" Width="6" Height="6" Fill="{DynamicResource ClaudeBrush}"/>
+                                <Ellipse Canvas.Left="2" Canvas.Top="15" Width="6" Height="6" Fill="{DynamicResource ClaudeBrush}"/>
+                            </Canvas>
+                            <TextBlock x:Name="HeaderTitleText" Text="Κόμβος" FontSize="28" FontWeight="Bold" FontFamily="Bahnschrift"
+                                       Foreground="{DynamicResource InkBrush}" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="VersionText" FontSize="12" Margin="8,0,0,0"
+                                       Foreground="{DynamicResource InkSoftBrush}" VerticalAlignment="Bottom"/>
+                        </StackPanel>
+                        <TextBlock x:Name="HeaderSubtitleText" TextWrapping="Wrap" Foreground="{DynamicResource InkSoftBrush}" Margin="0,4,0,10"
+                                   Text="Ο Claude είναι ο κεντρικός agent. Μιλάς μαζί του — φέρνει τους κατάλληλους agents ανάλογα με το task, είτε λειτουργούν μέσω ιστοσελίδας είτε ως MCP connector μέσα στο Claude Desktop."/>
+                        <TextBlock x:Name="ApiKeyHintText" Foreground="{DynamicResource InkSoftBrush}" FontSize="11.5"
+                                   Text="Ρυθμίσεις agents / κλειδιά API: πάτησε το εικονίδιο &quot;C&quot; πάνω-αριστερά."/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Chat panel -->
+                <Border x:Name="ChatPanelBorder" Grid.Row="1" Margin="24,0,24,10" Background="{DynamicResource PanelBrush}"
+                        BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" CornerRadius="5"
+                        AllowDrop="True" Drop="ChatPanelBorder_Drop" DragOver="ChatPanelBorder_DragOver">
+                    <Grid Margin="14">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <ScrollViewer x:Name="ChatScroll" Grid.Row="0" VerticalScrollBarVisibility="Auto"
+                                      ScrollChanged="ChatScroll_ScrollChanged">
+                            <StackPanel x:Name="ChatLogPanel"/>
+                        </ScrollViewer>
+                        <Button x:Name="ScrollToBottomButton" Grid.Row="0" Content="&#8595;" Width="34" Height="34"
+                                FontSize="14" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,10"
+                                Background="{DynamicResource ClaudeBrush}" Foreground="White" BorderThickness="0"
+                                Cursor="Hand" Visibility="Collapsed" Click="ScrollToBottomButton_Click"/>
+                        <Grid Grid.Row="1" Margin="0,10,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Chip προεπισκόπησης εικόνας που πρόκειται να σταλεί -->
+                            <Border x:Name="PendingAttachmentChip" Grid.Row="0" Visibility="Collapsed"
+                                    Margin="0,0,0,8" Padding="5,4" CornerRadius="6" BorderThickness="1"
+                                    HorizontalAlignment="Left" BorderBrush="{DynamicResource LineBrush}"
+                                    Background="{DynamicResource PaperBrush}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image x:Name="PendingAttachmentThumb" Width="28" Height="28" Margin="0,0,6,0" Stretch="UniformToFill"/>
+                                    <TextBlock x:Name="PendingAttachmentName" FontSize="11" VerticalAlignment="Center"
+                                               Foreground="{DynamicResource InkBrush}"/>
+                                    <Button x:Name="RemoveAttachmentButton" Content="&#x2715;" Margin="8,0,0,0" Width="18" Height="18"
+                                            FontSize="9" Background="Transparent" BorderThickness="0" Cursor="Hand"
+                                            Click="RemoveAttachmentButton_Click" Foreground="{DynamicResource InkSoftBrush}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Button x:Name="AttachButton" Grid.Column="0" Content="&#128206;" Margin="0,0,6,0"
+                                        Width="42" Height="36" FontSize="16" Padding="0" VerticalAlignment="Top" Background="Transparent"
+                                        BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+                                        Foreground="{DynamicResource InkBrush}" Cursor="Hand"
+                                        Click="AttachButton_Click" ToolTip="Επισύναψη αρχείου (εικόνα ή κείμενο/κώδικας - .md, .txt, .json, κ.ά.)"
+                                        AutomationProperties.Name="Επισύναψη αρχείου"/>
+                                <Button x:Name="ThinkingToggleButton" Grid.Column="1" Content="&#129504;" Margin="0,0,6,0"
+                                        Width="42" Height="36" FontSize="16" Padding="0" VerticalAlignment="Top" Background="Transparent"
+                                        BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+                                        Foreground="{DynamicResource InkBrush}" Cursor="Hand"
+                                        Click="ThinkingToggleButton_Click" ToolTip="Ορατό σκεπτικό (extended thinking) - μόνο Claude"
+                                        AutomationProperties.Name="Ορατό σκεπτικό"/>
+                                <Button x:Name="WebSearchToggleButton" Grid.Column="2" Content="&#127760;" Margin="0,0,6,0"
+                                        Width="42" Height="36" FontSize="16" Padding="0" VerticalAlignment="Top" Background="Transparent"
+                                        BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+                                        Foreground="{DynamicResource InkBrush}" Cursor="Hand"
+                                        Click="WebSearchToggleButton_Click" ToolTip="Αναζήτηση στο διαδίκτυο - μόνο Claude"
+                                        AutomationProperties.Name="Αναζήτηση στο διαδίκτυο"/>
+                                <Button x:Name="CompareToggleButton" Grid.Column="3" Content="&#9878;" Margin="0,0,6,0"
+                                        Width="42" Height="36" FontSize="16" Padding="0" VerticalAlignment="Top" Background="Transparent"
+                                        BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+                                        Foreground="{DynamicResource InkBrush}" Cursor="Hand"
+                                        Click="CompareToggleButton_Click" ToolTip="Σύγκριση απαντήσεων από πολλαπλά agents ταυτόχρονα"
+                                        AutomationProperties.Name="Σύγκριση agents"/>
+                                <Button x:Name="HandoffButton" Grid.Column="4" Content="&#128279;" Margin="0,0,8,0"
+                                        Width="42" Height="36" FontSize="16" Padding="0" VerticalAlignment="Top" Background="Transparent"
+                                        BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+                                        Foreground="{DynamicResource InkBrush}" Cursor="Hand"
+                                        Click="HandoffButton_Click" ToolTip="Handoff: στείλε το κείμενο σε έναν agent, μετά η απάντησή του σε δεύτερο agent για βελτίωση"
+                                        AutomationProperties.Name="Handoff pipeline"/>
+                                <Button x:Name="PromptLibraryButton" Grid.Column="5" Content="&#128218;" Margin="0,0,8,0"
+                                        Width="42" Height="36" FontSize="16" Padding="0" VerticalAlignment="Top" Background="Transparent"
+                                        BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+                                        Foreground="{DynamicResource InkBrush}" Cursor="Hand"
+                                        Click="PromptLibraryButton_Click" ToolTip="Βιβλιοθήκη prompts: έτοιμα σημεία εκκίνησης, μηδενικό κόστος tokens μέχρι να τα στείλεις"
+                                        AutomationProperties.Name="Βιβλιοθήκη prompts"/>
+                                <Button x:Name="MicButton" Grid.Column="6" Content="&#127908;" Margin="0,0,8,0"
+                                        Width="42" Height="36" FontSize="16" Padding="0" VerticalAlignment="Top" Background="Transparent"
+                                        BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+                                        Foreground="{DynamicResource InkBrush}" Cursor="Hand"
+                                        Click="MicButton_Click" ToolTip="Φωνητική εισαγωγή (τοπικά, δωρεάν - πάτησε, μίλα, ξαναπάτησε)"
+                                        AutomationProperties.Name="Φωνητική εισαγωγή"/>
+                                <TextBox x:Name="ChatInputBox" Grid.Column="7" Padding="8" VerticalContentAlignment="Top"
+                                         Background="{DynamicResource PaperBrush}" Foreground="{DynamicResource InkBrush}"
+                                         BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+                                         AcceptsReturn="True" TextWrapping="Wrap" MinHeight="36" MaxHeight="120"
+                                         VerticalScrollBarVisibility="Auto"
+                                         KeyDown="ChatInputBox_KeyDown"/>
+                                <Button x:Name="SendButton" Grid.Column="8" Content="Αποστολή" Margin="8,0,0,0"
+                                        Padding="16,0" Height="36" VerticalAlignment="Top" Background="{DynamicResource ClaudeBrush}" Foreground="White"
+                                        BorderThickness="0" Click="SendButton_Click" Cursor="Hand"/>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- Category tabs + αναζήτηση εργαλείων -->
+                <Grid x:Name="CategoryTabsRow" Grid.Row="2" Margin="24,0,24,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Auto"
+                                  VerticalScrollBarVisibility="Disabled">
+                        <StackPanel x:Name="CategoryTabsPanel" Orientation="Horizontal"/>
+                    </ScrollViewer>
+                    <TextBox x:Name="ToolSearchBox" Grid.Column="1" Width="180" Margin="10,0,0,0" Padding="8,5"
+                             Background="{DynamicResource PaperBrush}" Foreground="{DynamicResource InkBrush}"
+                             BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+                             VerticalAlignment="Center" TextChanged="ToolSearchBox_TextChanged"/>
+                </Grid>
+
+                <!-- Category tiles - πλευρικά βελάκια σελιδοποίησης αντί για scrollbar. Το ScrollViewer
+                     παραμένει ο πραγματικός μηχανισμός μετακίνησης (PageUp/PageDown = μία "σελίδα" ύψους
+                     viewport τη φορά), απλά η δική του μπάρα κύλισης είναι κρυμμένη. -->
+                <Grid x:Name="CategoryTilesRow" Grid.Row="3" Margin="24,0,24,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <ScrollViewer x:Name="TilesScroll" Grid.Column="0" VerticalScrollBarVisibility="Hidden"
+                                  ScrollChanged="TilesScroll_ScrollChanged">
+                        <StackPanel x:Name="CategoriesPanel"/>
+                    </ScrollViewer>
+                    <StackPanel x:Name="TilesPagerPanel" Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0" HorizontalAlignment="Center">
+                        <Button x:Name="TilesPageUpButton" Content="&#9650;" Width="30" Height="30" FontSize="11" Margin="0,0,0,6"
+                                Background="Transparent" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+                                Foreground="{DynamicResource InkBrush}" Cursor="Hand" Click="TilesPageUpButton_Click"
+                                ToolTip="Προηγούμενη σελίδα εργαλείων"/>
+                        <TextBlock x:Name="TilesPageIndicatorText" FontSize="10" HorizontalAlignment="Center" Margin="0,0,0,6"
+                                   Foreground="{DynamicResource InkSoftBrush}"/>
+                        <Button x:Name="TilesPageDownButton" Content="&#9660;" Width="30" Height="30" FontSize="11"
+                                Background="Transparent" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+                                Foreground="{DynamicResource InkBrush}" Cursor="Hand" Click="TilesPageDownButton_Click"
+                                ToolTip="Επόμενη σελίδα εργαλείων"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Status bar -->
+                <Border x:Name="StatusBarRow" Grid.Row="4" Background="{DynamicResource PanelBrush}"
+                        BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,1,0,0" Padding="16,10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock x:Name="TaskLabel" Text="Έτοιμο." FontSize="12" Width="200"
+                                       Foreground="{DynamicResource InkSoftBrush}" VerticalAlignment="Center"/>
+                            <ProgressBar x:Name="TaskProgress" Width="180" Height="8" Margin="10,0,0,0"
+                                         Minimum="0" Maximum="100" Value="0"/>
+                            <Button x:Name="NewChatButton" Margin="14,0,0,0"
+                                    Background="Transparent" BorderThickness="0" FontSize="12" Cursor="Hand"
+                                    Foreground="{DynamicResource InkSoftBrush}" Click="NewChatButton_Click"/>
+                            <Button x:Name="HistoryButton" Margin="10,0,0,0"
+                                    Background="Transparent" BorderThickness="0" FontSize="12" Cursor="Hand"
+                                    Foreground="{DynamicResource InkSoftBrush}" Click="HistoryButton_Click"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock x:Name="ClaudeTokenText" Text="Claude: 0 / 200.000 tokens" FontSize="12"
+                                       Foreground="{DynamicResource InkBrush}" VerticalAlignment="Center"/>
+                            <TextBlock Text="   ·   " Foreground="{DynamicResource InkSoftBrush}" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="CombinedTokenText" Text="Σύνολο agents: 0 tokens" FontSize="12"
+                                       Foreground="{DynamicResource InkBrush}" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="CacheHitText" Margin="10,0,0,0" FontSize="11.5" Visibility="Collapsed"
+                                       Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center"
+                                       ToolTipService.ToolTip="Ποσοστό tokens που εξυπηρετήθηκαν από prompt cache αντί να χρεωθούν πλήρως (χαμηλότερο κόστος)."/>
+                            <Button x:Name="BreakdownButton" Content="Ανά εργαλείο &#9662;" Margin="14,0,0,0"
+                                    Background="Transparent" BorderThickness="0" FontSize="12" Cursor="Hand"
+                                    Foreground="{DynamicResource InkSoftBrush}" Click="BreakdownButton_Click"/>
+                            <Button x:Name="AnalyticsButton" Content="&#128202;" Margin="10,0,0,0" Width="26" Padding="0"
+                                    Background="Transparent" BorderThickness="0" FontSize="13" Cursor="Hand"
+                                    Foreground="{DynamicResource InkSoftBrush}" Click="AnalyticsButton_Click"
+                                    ToolTip="Αναλυτικά χρήσης (τοπικά, ανά συνεδρία)" AutomationProperties.Name="Αναλυτικά χρήσης"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- Language selection popup -->
+            <Popup x:Name="LangSelectPopup" Grid.Row="1" Grid.Column="1" Placement="Right" StaysOpen="False" AllowsTransparency="True">
+                <Border x:Name="LangPopupBorder" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource LineBrush}"
+                        BorderThickness="1" CornerRadius="6" Padding="4">
+                    <StackPanel x:Name="LangOptionsPanel"/>
+                </Border>
+            </Popup>
+
+            <!-- Artifacts: μπλοκ κώδικα εξαγμένα από όλες τις συζητήσεις (τρέχουσα + αποθηκευμένες) -->
+            <Popup x:Name="ArtifactsPopup" Grid.Row="1" Grid.Column="1" Placement="Right" StaysOpen="False" AllowsTransparency="True">
+                <Border x:Name="ArtifactsPopupBorder" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource LineBrush}"
+                        BorderThickness="1" CornerRadius="6" Padding="10" MaxHeight="520" Width="420">
+                    <StackPanel>
+                        <TextBlock x:Name="ArtifactsTitleText" FontWeight="Bold" FontSize="12" Margin="4,0,4,8"
+                                   Foreground="{DynamicResource InkBrush}"/>
+                        <ScrollViewer MaxHeight="460" VerticalScrollBarVisibility="Auto">
+                            <StackPanel x:Name="ArtifactsListPanel"/>
+                        </ScrollViewer>
+                    </StackPanel>
+                </Border>
+            </Popup>
+
+            <!-- Per-tool usage breakdown popup -->
+            <Popup x:Name="BreakdownPopup" Grid.Row="1" Grid.Column="1" Placement="Bottom" StaysOpen="False" AllowsTransparency="True">
+                <Border x:Name="BreakdownPopupBorder" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource LineBrush}"
+                        BorderThickness="1" CornerRadius="4" Padding="12" MaxHeight="320" MinWidth="240">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel x:Name="BreakdownPanel"/>
+                    </ScrollViewer>
+                </Border>
+            </Popup>
+
+            <!-- Handoff pipeline: επιλογή 2 agents - ο δεύτερος βελτιώνει την απάντηση του πρώτου -->
+            <Popup x:Name="HandoffPopup" Grid.Row="1" Grid.Column="1" Placement="Top" StaysOpen="False" AllowsTransparency="True">
+                <Border x:Name="HandoffPopupBorder" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource LineBrush}"
+                        BorderThickness="1" CornerRadius="6" Padding="14" MinWidth="300">
+                    <StackPanel>
+                        <TextBlock x:Name="HandoffTitleText" FontWeight="Bold" FontSize="12" Margin="0,0,0,10"
+                                   Foreground="{DynamicResource InkBrush}"/>
+                        <TextBlock x:Name="HandoffStepALabel" FontSize="10.5" Margin="0,0,0,4"
+                                   Foreground="{DynamicResource InkSoftBrush}"/>
+                        <ComboBox x:Name="HandoffAgentACombo" Margin="0,0,0,10"/>
+                        <TextBlock x:Name="HandoffStepBLabel" FontSize="10.5" Margin="0,0,0,4"
+                                   Foreground="{DynamicResource InkSoftBrush}"/>
+                        <ComboBox x:Name="HandoffAgentBCombo" Margin="0,0,0,12"/>
+                        <TextBlock x:Name="HandoffHintText" TextWrapping="Wrap" FontSize="10" Margin="0,0,0,10"
+                                   Foreground="{DynamicResource InkSoftBrush}"/>
+                        <Button x:Name="HandoffRunButton" Padding="10,6" Background="{DynamicResource ClaudeBrush}"
+                                Foreground="White" BorderThickness="0" Cursor="Hand" Click="HandoffRunButton_Click"/>
+                    </StackPanel>
+                </Border>
+            </Popup>
+
+            <!-- Βιβλιοθήκη prompts (v4.1.0) - έτοιμα, δικά μας σημεία εκκίνησης ανά κατηγορία, μηδενικό
+                 κόστος tokens μέχρι να επιλέξεις και να στείλεις ένα -->
+            <Popup x:Name="PromptLibraryPopup" Grid.Row="1" Grid.Column="1" Placement="Top" StaysOpen="False" AllowsTransparency="True">
+                <Border x:Name="PromptLibraryPopupBorder" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource LineBrush}"
+                        BorderThickness="1" CornerRadius="6" Padding="14" MinWidth="340" MaxHeight="420">
+                    <StackPanel>
+                        <TextBlock x:Name="PromptLibraryTitleText" FontWeight="Bold" FontSize="12" Margin="0,0,0,10"
+                                   Foreground="{DynamicResource InkBrush}"/>
+                        <ScrollViewer MaxHeight="360" VerticalScrollBarVisibility="Auto">
+                            <StackPanel x:Name="PromptLibraryListPanel"/>
+                        </ScrollViewer>
+                    </StackPanel>
+                </Border>
+            </Popup>
+
+            <!-- Λίστα αποθηκευμένων συζητήσεων -->
+            <Popup x:Name="HistoryPopup" Grid.Row="1" Grid.Column="1" Placement="Bottom" StaysOpen="False" AllowsTransparency="True">
+                <Border x:Name="HistoryPopupBorder" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource LineBrush}"
+                        BorderThickness="1" CornerRadius="6" Padding="10" MaxHeight="440" MinWidth="320">
+                    <StackPanel>
+                        <TextBlock x:Name="ProjectsSectionLabel" FontSize="10.5" FontWeight="Bold" Margin="4,0,4,6"
+                                   Foreground="{DynamicResource InkSoftBrush}"/>
+                        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Margin="0,0,0,10">
+                            <StackPanel x:Name="ProjectChipsPanel" Orientation="Horizontal"/>
+                        </ScrollViewer>
+                        <Border BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,0,0,1" Margin="0,0,0,10"/>
+
+                        <TextBlock x:Name="HistoryTitleText" FontWeight="Bold" FontSize="12" Margin="4,0,4,8"
+                                   Foreground="{DynamicResource InkBrush}"/>
+                        <TextBox x:Name="HistorySearchBox" Margin="0,0,0,8" Padding="5"
+                                 Background="{DynamicResource PaperBrush}" Foreground="{DynamicResource InkBrush}"
+                                 BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+                                 TextChanged="HistorySearchBox_TextChanged"/>
+                        <ScrollViewer MaxHeight="300" VerticalScrollBarVisibility="Auto">
+                            <StackPanel x:Name="HistoryListPanel"/>
+                        </ScrollViewer>
+                    </StackPanel>
+                </Border>
+            </Popup>
+
+            <!-- Details slide-in panel -->
+            <Border x:Name="DetailsPanel" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right" Width="320"
+                    Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource LineBrush}"
+                    BorderThickness="1,0,0,0" Visibility="Collapsed">
+                <Grid Margin="20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Button Grid.Row="0" Content="&#10005;" HorizontalAlignment="Right" Background="Transparent"
+                            BorderThickness="0" FontSize="14" Click="CloseDetails_Click" Cursor="Hand"
+                            Foreground="{DynamicResource InkSoftBrush}"/>
+
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,4,0,4" VerticalAlignment="Center">
+                        <Grid x:Name="DetailsLogoBox" Width="28" Height="28" Margin="0,0,8,0"/>
+                        <TextBlock x:Name="DetailsTitle" FontSize="20" FontWeight="Bold"
+                                   Foreground="{DynamicResource InkBrush}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                        <StackPanel x:Name="DetailsPinStarBox" Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,0,0,10">
+                        <TextBlock x:Name="DetailsFree" FontSize="11" Padding="6,2" Margin="0,0,6,0"
+                                   Foreground="{DynamicResource InkSoftBrush}"/>
+                        <TextBlock x:Name="DetailsMcpTag" Text="MCP" FontSize="10" FontWeight="Bold" Padding="5,1"
+                                   Foreground="{DynamicResource ClaudeBrush}" Visibility="Collapsed"/>
+                    </StackPanel>
+
+                    <TextBlock x:Name="DetailsDesc" Grid.Row="3" TextWrapping="Wrap" VerticalAlignment="Top"
+                               Foreground="{DynamicResource InkSoftBrush}" FontSize="13.5"/>
+
+                    <StackPanel Grid.Row="4" Margin="0,14,0,0">
+                        <Button x:Name="DetailsOpenBtn" Content="Άνοιγμα δωρεάν έκδοσης ↗" Padding="10" Margin="0,0,0,8"
+                                Background="{DynamicResource ClaudeBrush}" Foreground="White" BorderThickness="0"
+                                Click="DetailsOpenBtn_Click" Cursor="Hand"/>
+                        <Button x:Name="DetailsMcpBtn" Content="Πρόσθεσε στο Claude Desktop (MCP) ↗" Padding="10" Margin="0,0,0,8"
+                                Background="Transparent" BorderBrush="{DynamicResource ClaudeBrush}" BorderThickness="1"
+                                Foreground="{DynamicResource ClaudeBrush}" Click="DetailsMcpBtn_Click" Cursor="Hand"
+                                Visibility="Collapsed"/>
+                        <Button x:Name="DetailsPricingBtn" Content="Αναβάθμιση σε πληρωμένο πλάνο ↗" Padding="10"
+                                Background="Transparent" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+                                Foreground="{DynamicResource InkBrush}" Click="DetailsPricingBtn_Click" Cursor="Hand"
+                                Visibility="Collapsed"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Aero glass tint (Vista/Win7 skin): διακοσμητική επικάλυψη, δεν μπλοκάρει clicks -->
+            <Border x:Name="GlassTintOverlay" Grid.RowSpan="3" Grid.ColumnSpan="2" Visibility="Collapsed"
+                    IsHitTestVisible="False" Panel.ZIndex="900">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#30FFFFFF" Offset="0"/>
+                        <GradientStop Color="#0060A0D0" Offset="0.4"/>
+                        <GradientStop Color="#1060A0D0" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+            </Border>
+
+            <!-- Splash: "curtain" εφέ στην εκκίνηση, μαζεύεται προς τη θέση του τίτλου -->
+            <Grid x:Name="SplashOverlay" Grid.RowSpan="3" Grid.ColumnSpan="2" Panel.ZIndex="1000">
+                <Grid.Background>
+                    <SolidColorBrush x:Name="SplashBackgroundBrush" Color="#FBF8F3"/>
+                </Grid.Background>
+                <StackPanel x:Name="SplashContent" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                    <StackPanel.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform x:Name="SplashScale" ScaleX="1" ScaleY="1"/>
+                            <TranslateTransform x:Name="SplashTranslate" X="0" Y="0"/>
+                        </TransformGroup>
+                    </StackPanel.RenderTransform>
+                    <Canvas Width="120" Height="120" HorizontalAlignment="Center">
+                        <Line X1="60" Y1="60" X2="60" Y2="13" Stroke="#C1633A" StrokeThickness="8" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                        <Line X1="60" Y1="60" X2="97" Y2="83" Stroke="#C1633A" StrokeThickness="8" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                        <Line X1="60" Y1="60" X2="23" Y2="83" Stroke="#C1633A" StrokeThickness="8" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                        <Ellipse Canvas.Left="43" Canvas.Top="43" Width="34" Height="34" Fill="#C1633A"/>
+                        <Ellipse Canvas.Left="45" Canvas.Top="0" Width="30" Height="30" Fill="#C1633A"/>
+                        <Ellipse Canvas.Left="82" Canvas.Top="68" Width="30" Height="30" Fill="#C1633A"/>
+                        <Ellipse Canvas.Left="8" Canvas.Top="68" Width="30" Height="30" Fill="#C1633A"/>
+                    </Canvas>
+                    <TextBlock x:Name="SplashTitleText" FontSize="56" FontWeight="Bold" FontFamily="Bahnschrift"
+                               Foreground="{DynamicResource InkBrush}" HorizontalAlignment="Center" Margin="0,20,0,0"/>
+                    <TextBlock x:Name="SplashVersionText" FontSize="20"
+                               Foreground="{DynamicResource InkSoftBrush}" HorizontalAlignment="Center" Margin="0,6,0,0"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Οδηγός πρώτης εκκίνησης (onboarding) - πάνω από ΟΛΑ, ακόμα και το splash. Ξαναδιαθέσιμος
+                 μόνιμα από Ρυθμίσεις → Πληροφορίες → Βοήθεια ("Προβολή οδηγού ξανά"). -->
+            <Grid x:Name="OnboardingOverlay" Grid.RowSpan="3" Grid.ColumnSpan="2" Panel.ZIndex="2000"
+                  Background="{DynamicResource PaperBrush}" Visibility="Collapsed">
+                <Button x:Name="OnboardingSkipButton" Content="" FontSize="11.5" HorizontalAlignment="Right" VerticalAlignment="Top"
+                        Margin="0,18,26,0" Padding="8,4" Background="Transparent" BorderThickness="0" Cursor="Hand"
+                        Foreground="{DynamicResource InkSoftBrush}" Click="OnboardingSkipButton_Click"/>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="480">
+                    <!-- "Ζωντανή" επίδειξη ανά σελίδα - μικρό, αυτο-επαναλαμβανόμενο vector animation αντί για
+                         στατικό emoji, σχεδιασμένο σε κώδικα (BuildOnboardingDemo) με το ίδιο μοτίβο Storyboard
+                         που ήδη χρησιμοποιούν τα κινούμενα φόντα (BuildOrbit/BuildGears κ.λπ.) - καμία εξωτερική
+                         εικόνα/GIF, μηδενικό μέγεθος επιπλέον αρχείων. -->
+                    <Border Width="320" Height="140" CornerRadius="10" Margin="0,0,0,18"
+                            Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1">
+                        <Canvas x:Name="OnboardingDemoCanvas" Width="320" Height="140" ClipToBounds="True"/>
+                    </Border>
+                    <TextBlock x:Name="OnboardingIconText" FontSize="28" HorizontalAlignment="Center" Margin="0,0,0,10"
+                               Foreground="{DynamicResource InkBrush}"/>
+                    <TextBlock x:Name="OnboardingTitleText" FontSize="24" FontWeight="Bold" FontFamily="Bahnschrift"
+                               HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap"
+                               Foreground="{DynamicResource InkBrush}"/>
+                    <TextBlock x:Name="OnboardingBodyText" FontSize="13.5" HorizontalAlignment="Center" TextAlignment="Center"
+                               TextWrapping="Wrap" Margin="0,14,0,0" Foreground="{DynamicResource InkSoftBrush}"/>
+                    <StackPanel x:Name="OnboardingDotsPanel" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,28,0,0"/>
+                    <Grid Margin="0,26,0,0" Width="360">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Button x:Name="OnboardingBackButton" Grid.Column="0" Content="&#8592;" Width="42" Height="36"
+                                FontSize="16" Background="Transparent" BorderBrush="{DynamicResource LineBrush}"
+                                BorderThickness="1" Foreground="{DynamicResource InkBrush}" Cursor="Hand"
+                                Click="OnboardingBackButton_Click"/>
+                        <Button x:Name="OnboardingNextButton" Grid.Column="2" Content="&#8594;" Width="120" Height="36"
+                                FontSize="14" Background="{DynamicResource ClaudeBrush}" Foreground="White"
+                                BorderThickness="0" Cursor="Hand" Click="OnboardingNextButton_Click"/>
+                    </Grid>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

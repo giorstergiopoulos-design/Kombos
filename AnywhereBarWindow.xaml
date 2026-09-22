@@ -1,0 +1,49 @@
+<Window x:Class="Kombos.AnywhereBarWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Κόμβος Anywhere"
+        Width="560" SizeToContent="Height"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Topmost="True"
+        ShowInTaskbar="False"
+        ResizeMode="NoResize"
+        WindowStartupLocation="Manual"
+        FontFamily="Segoe UI"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True"
+        Deactivated="AnywhereBarWindow_Deactivated"
+        KeyDown="AnywhereBarWindow_KeyDown">
+
+    <Border x:Name="ShellBorder" CornerRadius="10" Background="{DynamicResource PanelBrush}"
+            BorderBrush="{DynamicResource LineBrush}" BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect Color="Black" BlurRadius="28" ShadowDepth="4" Opacity="0.4"/>
+        </Border.Effect>
+
+        <StackPanel Margin="14">
+            <TextBox x:Name="AnywhereInputBox" FontSize="15" Padding="8"
+                     Background="{DynamicResource PaperBrush}" Foreground="{DynamicResource InkBrush}"
+                     BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+                     KeyDown="AnywhereInputBox_KeyDown"/>
+            <TextBlock x:Name="AnywhereHintText" FontSize="10" Margin="0,6,0,0"
+                       Foreground="{DynamicResource InkSoftBrush}"/>
+
+            <Border x:Name="AnywhereResultBorder" Visibility="Collapsed" Margin="0,10,0,0" Padding="10"
+                    CornerRadius="6" Background="{DynamicResource PaperBrush}"
+                    BorderBrush="{DynamicResource LineBrush}" BorderThickness="1">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="260">
+                    <StackPanel>
+                        <TextBlock x:Name="AnywhereResultText" TextWrapping="Wrap" FontSize="12.5"
+                                   Foreground="{DynamicResource InkBrush}"/>
+                        <Button x:Name="AnywhereAddToChatButton" Margin="0,8,0,0" Padding="6,4"
+                                HorizontalAlignment="Left" Visibility="Collapsed"
+                                Background="Transparent" BorderBrush="{DynamicResource ClaudeBrush}" BorderThickness="1"
+                                Foreground="{DynamicResource ClaudeBrush}" Cursor="Hand" Click="AnywhereAddToChatButton_Click"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </StackPanel>
+    </Border>
+</Window>

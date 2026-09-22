@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>KombosDevToolkit</AssemblyName>
+    <RootNamespace>KombosDevToolkit</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Reference σε ήδη-χτισμένο Kombos.dll αντί για ProjectReference: το ProjectReference θα ξανάχτιζε
+         το Kombos.csproj σε ΚΑΘΕ build αυτού του plugin, κάτι που αποτυγχάνει όταν το Kombos.exe τρέχει ήδη
+         (κλειδωμένο bin\ output). Private=false ώστε να ΜΗΝ αντιγράφεται το Kombos.dll στο output του plugin
+         (θα βρεθεί ήδη φορτωμένο από τον host κατά το runtime - βλ. PluginLoadContext.Load()). Ενημέρωσε
+         το _ref\Kombos.dll (αντιγραφή από ένα φρέσκο build) αν αλλάξουν τα IKombosPlugin/IKombosHost/Models. -->
+    <Reference Include="Kombos">
+      <HintPath>..\_ref\Kombos.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>

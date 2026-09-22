@@ -1,0 +1,13 @@
+## .NET build output
+bin/
+obj/
+publish/
+plugins-src/**/bin/
+plugins-src/**/obj/
+
+## Inno Setup output
+installer/output/
+
+## User-specific
+*.user
+.vs/

@@ -1,0 +1,27 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Επιφάνειες -->
+    <SolidColorBrush x:Key="PaperBrush" Color="#1E1B16"/>
+    <SolidColorBrush x:Key="PanelBrush" Color="#27231D"/>
+    <SolidColorBrush x:Key="SidebarBrush" Color="#14110D"/>
+    <SolidColorBrush x:Key="LineBrush" Color="#3A362D"/>
+
+    <!-- Κείμενο -->
+    <SolidColorBrush x:Key="InkBrush" Color="#EDE7DA"/>
+    <SolidColorBrush x:Key="InkSoftBrush" Color="#A39C8C"/>
+
+    <!-- Accent -->
+    <SolidColorBrush x:Key="ClaudeBrush" Color="#D97C52"/>
+
+    <!-- Χρώματα ανά κατηγορία (ίδιες αποχρώσεις με το Light, ελαφρώς πιο ανοιχτά για αντίθεση σε σκούρο φόντο) -->
+    <SolidColorBrush x:Key="TextCatBrush" Color="#6B9BC2"/>
+    <SolidColorBrush x:Key="ImgCatBrush" Color="#C97FCC"/>
+    <SolidColorBrush x:Key="VideoCatBrush" Color="#E06B7C"/>
+    <SolidColorBrush x:Key="AudioCatBrush" Color="#5FC08A"/>
+    <SolidColorBrush x:Key="CodeCatBrush" Color="#97C158"/>
+    <SolidColorBrush x:Key="AgentsCatBrush" Color="#DDA050"/>
+    <SolidColorBrush x:Key="ResearchCatBrush" Color="#9880C9"/>
+    <SolidColorBrush x:Key="DesignCatBrush" Color="#5FBFC4"/>
+
+</ResourceDictionary>

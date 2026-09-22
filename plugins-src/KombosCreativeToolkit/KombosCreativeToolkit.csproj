@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>KombosCreativeToolkit</AssemblyName>
+    <RootNamespace>KombosCreativeToolkit</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="Kombos">
+      <HintPath>..\_ref\Kombos.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>

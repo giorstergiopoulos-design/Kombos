@@ -1,0 +1,59 @@
+<Window x:Class="Kombos.CommandPaletteWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Γρήγορη εντολή"
+        Width="560" Height="420" MinWidth="420" MinHeight="300"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        FontFamily="Segoe UI"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True"
+        WindowStartupLocation="CenterOwner"
+        Deactivated="CommandPaletteWindow_Deactivated"
+        PreviewKeyDown="CommandPaletteWindow_PreviewKeyDown">
+
+    <Border x:Name="ShellBorder" CornerRadius="8" Background="{DynamicResource PanelBrush}"
+            BorderBrush="{DynamicResource LineBrush}" BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect Color="Black" BlurRadius="24" ShadowDepth="4" Opacity="0.38"/>
+        </Border.Effect>
+
+        <Grid Margin="14">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBox x:Name="PaletteSearchBox" Grid.Row="0" Padding="10,8" FontSize="14"
+                     Background="{DynamicResource PaperBrush}" Foreground="{DynamicResource InkBrush}"
+                     BorderBrush="{DynamicResource ClaudeBrush}" BorderThickness="1.5"
+                     TextChanged="PaletteSearchBox_TextChanged"/>
+
+            <ListBox x:Name="PaletteResultsList" Grid.Row="1" Margin="0,10,0,0" Background="Transparent"
+                     BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                     MouseDoubleClick="PaletteResultsList_MouseDoubleClick">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="6,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{Binding Label}" FontSize="12.5"
+                                       Foreground="{DynamicResource InkBrush}"/>
+                            <TextBlock Grid.Column="1" Text="{Binding Category}" FontSize="10"
+                                       Foreground="{DynamicResource InkSoftBrush}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <TextBlock x:Name="PaletteHintText" Grid.Row="2" Margin="0,10,0,0" FontSize="10"
+                       Foreground="{DynamicResource InkSoftBrush}"/>
+        </Grid>
+    </Border>
+</Window>

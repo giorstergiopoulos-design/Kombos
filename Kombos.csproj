@@ -1,0 +1,61 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>Kombos</AssemblyName>
+    <RootNamespace>Kombos</RootNamespace>
+    <ApplicationTitle>Κόμβος</ApplicationTitle>
+    <ApplicationIcon>kombos.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="kombos.ico" />
+  </ItemGroup>
+
+  <!-- Ο φάκελος plugins-src\ έχει τα δικά του, ξεχωριστά .csproj (π.χ. το δείγμα KombosWeather) - χωρίς
+       αυτή την εξαίρεση, το implicit wildcard **/*.cs του SDK μαζεύει και τα δικά ΤΟΥΣ obj\ generated
+       αρχεία (AssemblyInfo.cs κ.λπ.), προκαλώντας CS0579 duplicate-attribute σφάλματα στο ίδιο το Kombos. -->
+  <ItemGroup>
+    <Compile Remove="plugins-src\**\*.cs" />
+    <None Remove="plugins-src\**" />
+    <Compile Remove="Kombos.Tests\**\*.cs" />
+    <None Remove="Kombos.Tests\**" />
+  </ItemGroup>
+
+  <!-- Το UseWindowsForms προσθέτει αυτόματα global using System.Windows.Forms, που συγκρούεται με τα
+       ομώνυμα τύπους του WPF (Application/Button/Brush/Color/DragEventArgs/KeyEventArgs κ.ά.) σε όλο το
+       project. Το TrayIconService.cs έχει ήδη το δικό του, τοπικό using - δεν χρειάζεται global. -->
+  <ItemGroup>
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.11" />
+    <!-- Φωνή (v4.5.0) - System.Speech.Synthesis (TTS, ανάγνωση απαντήσεων) και System.Speech.Recognition
+         (STT, φωνητική εισαγωγή). 100% τοπικό/δωρεάν - χρησιμοποιεί τον ενσωματωμένο μηχανισμό φωνής των
+         Windows, καμία κλήση cloud/API key. Στο .NET 8 (windows-desktop) είναι πλέον ξεχωριστό πακέτο, όχι
+         built-in όπως στο .NET Framework. -->
+    <PackageReference Include="System.Speech" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Kombos.Tests" />
+  </ItemGroup>
+
+  <!-- Επίσημα plugins ("Λήψη & Ενσωμάτωση" γκαλερί στις Ρυθμίσεις → Επεκτάσεις) - τα .dll τους χτίζονται
+       ξεχωριστά (plugins-src\) και αντιγράφονται εδώ χειροκίνητα· το Kombos τα ενσωματώνει σαν απλά αρχεία
+       περιεχομένου ώστε να ταξιδεύουν μαζί με κάθε build/publish/installer, διατηρώντας τη δομή φακέλων
+       PluginsBundled\<Όνομα>\*.dll (χρειάζεται η PluginLoader-συμβατή διάταξη ένα .dll ανά υποφάκελο). -->
+  <ItemGroup>
+    <None Include="PluginsBundled\**\*.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>PluginsBundled\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </None>
+  </ItemGroup>
+
+</Project>
