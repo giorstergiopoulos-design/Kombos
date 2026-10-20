@@ -15,6 +15,17 @@ namespace Kombos.Services
         /// <summary>"owner/repo" για τον προαιρετικό, χειροκίνητο έλεγχο νέας έκδοσης (v4.5.0) - κενό
         /// σημαίνει "δεν έχει οριστεί ακόμα", ο έλεγχος απλά δεν τρέχει.</summary>
         public string UpdateCheckRepo { get; set; } = "";
+        /// <summary>"Κόμβος Gateway" (v4.6.0, OmniRoute-style τοπική πύλη) - απενεργοποιημένο by default,
+        /// ο χρήστης το ενεργοποιεί ρητά από τις Ρυθμίσεις.</summary>
+        public bool GatewayEnabled { get; set; } = false;
+        public int GatewayPort { get; set; } = 8420;
+        /// <summary>Αυτόματη συνέχιση σε άλλο agent όταν το Claude πλησιάζει στο όριό του (v4.6.0) - βλ.
+        /// MainWindow.TryAutoContinueOnLimitAsync. Προεπιλογή true κατόπιν ρητού αιτήματος χρήστη.</summary>
+        public bool AutoContinueOnClaudeLimit { get; set; } = true;
+        /// <summary>Ο agent που διάλεξε ο χρήστης ΤΗΝ ΠΡΩΤΗ ΦΟΡΑ που το Claude έφτασε στο όριό του (v4.6.0) -
+        /// κενό μέχρι τότε. Από εκεί και πέρα το Κόμβος τον χρησιμοποιεί αυτόματα, χωρίς να ξαναρωτήσει,
+        /// ώστε η συζήτηση να συνεχίζει απρόσκοπτα - βλ. MainWindow.GetAssistantReplyAsync.</summary>
+        public string RememberedFallbackAgent { get; set; } = "";
         public bool SidebarRight { get; set; } = false;
         public string Transparency { get; set; } = "None";
         public string BgStyle { get; set; } = "None";

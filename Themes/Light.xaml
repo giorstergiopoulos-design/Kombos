@@ -1,5 +1,12 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Icons.xaml ΠΡΕΠΕΙ να συγχωνεύεται ΕΔΩ (μέσα στο ίδιο το theme dictionary), όχι σαν αδερφό entry στο
+         App.xaml - το ThemeToggleButton_Click κάνει Application.Current.Resources.MergedDictionaries.Clear()
+         σε κάθε εναλλαγή θέματος, που θα εξαφάνιζε ένα ξεχωριστό top-level Icons.xaml merge. Έτσι ταξιδεύει
+         πάντα μαζί με όποιο θέμα (Light/Dark) είναι ενεργό. -->
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="Icons.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
 
     <!-- Επιφάνειες -->
     <SolidColorBrush x:Key="PaperBrush" Color="#FBF8F3"/>

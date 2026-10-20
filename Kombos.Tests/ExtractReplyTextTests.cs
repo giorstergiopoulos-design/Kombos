@@ -65,5 +65,20 @@ namespace Kombos.Tests
         {
             Assert.Equal("hello", MainWindow.StripFences("  hello  "));
         }
+
+        [Fact]
+        public void LooksLikeRateLimit_On429Message_ReturnsTrue()
+        {
+            // v4.6.0 auto-continue: ο ClaudeClient ενσωματώνει τον HTTP status code στο μήνυμα ως "(429)".
+            var ex = new System.Exception("Anthropic API error (429): rate_limit_error");
+            Assert.True(MainWindow.LooksLikeRateLimit(ex));
+        }
+
+        [Fact]
+        public void LooksLikeRateLimit_OnOtherError_ReturnsFalse()
+        {
+            var ex = new System.Exception("Anthropic API error (401): authentication_error");
+            Assert.False(MainWindow.LooksLikeRateLimit(ex));
+        }
     }
 }

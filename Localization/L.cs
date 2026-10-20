@@ -10,7 +10,7 @@ namespace Kombos.Localization
     public static class L
     {
         public static Lang Current { get; set; } = Lang.EL;
-        public const string AppVersion = "4.5.0";
+        public const string AppVersion = "4.8.0";
 
         public static Lang Next => Current switch
         {
@@ -502,6 +502,147 @@ namespace Kombos.Localization
             Lang.EN => $"✅ Installed: {name} - needs a restart to activate.",
             Lang.FR => $"✅ Installé : {name} - un redémarrage est nécessaire pour l'activer.",
             _ => $"✅ Installiert: {name} - braucht einen Neustart zur Aktivierung."
+        };
+
+        /// <summary>"Κόμβος Gateway" (v4.6.0, OmniRoute-style τοπική πύλη) - βλ. Services/GatewayServer.cs.</summary>
+        /// <summary>Αυτόματη συνέχιση σε άλλο agent όταν το Claude πλησιάζει στο όριό του (v4.6.0) - βλ.
+        /// MainWindow.TryAutoContinueOnLimitAsync.</summary>
+        public static string AutoContinueLabel => Current switch
+        {
+            Lang.EL => "Αυτόματη συνέχιση σε άλλο agent όταν το Claude πλησιάζει στο όριό του",
+            Lang.EN => "Automatically continue with another agent when Claude nears its limit",
+            Lang.FR => "Continuer automatiquement avec un autre agent quand Claude approche de sa limite",
+            _ => "Automatisch mit einem anderen Agent fortfahren, wenn Claude an sein Limit stößt"
+        };
+
+        public static string AutoContinueHint => Current switch
+        {
+            Lang.EL => "Όταν φτάσει κοντά στο όριο tokens της συνεδρίας ή πάρει 429 (rate limit) από το Anthropic API, η ίδια συζήτηση συνεχίζει αυτόματα με τον επόμενο agent που έχεις ήδη ρυθμίσει με κλειδί - η φούσκα δείχνει ποιος πραγματικά απάντησε.",
+            Lang.EN => "When the session's token budget gets close, or the Anthropic API returns 429 (rate limit), the same conversation automatically continues with the next agent you've already configured with a key - the bubble shows who actually answered.",
+            Lang.FR => "Quand le budget de tokens de la session approche, ou que l'API Anthropic renvoie 429 (limite de débit), la même conversation continue automatiquement avec le prochain agent déjà configuré avec une clé - la bulle indique qui a réellement répondu.",
+            _ => "Wenn das Token-Budget der Sitzung sich dem Limit nähert oder die Anthropic-API 429 (Rate Limit) zurückgibt, wird dieselbe Unterhaltung automatisch mit dem nächsten bereits konfigurierten Agent fortgesetzt - die Sprechblase zeigt, wer wirklich geantwortet hat."
+        };
+
+        public static string AutoContinuedAgentLabel(string toolName) => Current switch
+        {
+            Lang.EL => $"{toolName} (αυτόματη συνέχιση)",
+            Lang.EN => $"{toolName} (auto-continued)",
+            Lang.FR => $"{toolName} (continué automatiquement)",
+            _ => $"{toolName} (automatisch fortgesetzt)"
+        };
+
+        /// <summary>v4.6.0 - pop-up ΤΗΝ ΠΡΩΤΗ ΦΟΡΑ που το Claude πλησιάζει στο όριό του· μετά το Κόμβος
+        /// θυμάται την επιλογή και δεν ξαναρωτάει (βλ. MainWindow.ResolveFallbackAgent).</summary>
+        public static string ClaudeLimitNearAsk(string toolName) => Current switch
+        {
+            Lang.EL => $"Το Claude πλησιάζει στο όριο tokens αυτής της συνεδρίας.\n\nΘέλεις να συνεχίσει η συζήτηση αυτόματα με το {toolName} (έχεις ήδη αποθηκευμένο κλειδί);\n\nΗ επιλογή σου θα θυμάται από εδώ και πέρα - δεν θα ξαναρωτηθείς.",
+            Lang.EN => $"Claude is nearing this session's token limit.\n\nDo you want the conversation to continue automatically with {toolName} (you already have a saved key for it)?\n\nYour choice will be remembered from now on - you won't be asked again.",
+            Lang.FR => $"Claude approche de la limite de tokens de cette session.\n\nVeux-tu que la conversation continue automatiquement avec {toolName} (tu as déjà une clé enregistrée) ?\n\nTon choix sera mémorisé désormais - on ne te redemandera plus.",
+            _ => $"Claude nähert sich dem Token-Limit dieser Sitzung.\n\nSoll die Unterhaltung automatisch mit {toolName} fortgesetzt werden (du hast dafür bereits einen gespeicherten Schlüssel)?\n\nDeine Wahl wird ab jetzt gemerkt - du wirst nicht erneut gefragt."
+        };
+
+        public static string ClaudeLimitReachedAsk(string toolName) => Current switch
+        {
+            Lang.EL => $"Το Claude έφτασε σε όριο (rate limit) αυτή τη στιγμή.\n\nΘέλεις να συνεχίσει η συζήτηση αυτόματα με το {toolName} (έχεις ήδη αποθηκευμένο κλειδί);\n\nΗ επιλογή σου θα θυμάται από εδώ και πέρα - δεν θα ξαναρωτηθείς.",
+            Lang.EN => $"Claude just hit a rate limit.\n\nDo you want the conversation to continue automatically with {toolName} (you already have a saved key for it)?\n\nYour choice will be remembered from now on - you won't be asked again.",
+            Lang.FR => $"Claude vient d'atteindre une limite de débit.\n\nVeux-tu que la conversation continue automatiquement avec {toolName} (tu as déjà une clé enregistrée) ?\n\nTon choix sera mémorisé désormais - on ne te redemandera plus.",
+            _ => $"Claude hat gerade ein Rate Limit erreicht.\n\nSoll die Unterhaltung automatisch mit {toolName} fortgesetzt werden (du hast dafür bereits einen gespeicherten Schlüssel)?\n\nDeine Wahl wird ab jetzt gemerkt - du wirst nicht erneut gefragt."
+        };
+
+        public static string RememberedFallbackText(string toolName) => Current switch
+        {
+            Lang.EL => $"✓ Θυμάται: αυτόματη συνέχιση με {toolName}",
+            Lang.EN => $"✓ Remembered: auto-continue with {toolName}",
+            Lang.FR => $"✓ Mémorisé : continuation automatique avec {toolName}",
+            _ => $"✓ Gemerkt: automatische Fortsetzung mit {toolName}"
+        };
+
+        public static string NoRememberedFallback => Current switch
+        {
+            Lang.EL => "Δεν έχεις επιλέξει ακόμα - θα ρωτηθείς την πρώτη φορά που θα χρειαστεί.",
+            Lang.EN => "You haven't chosen yet - you'll be asked the first time it's needed.",
+            Lang.FR => "Tu n'as pas encore choisi - on te demandera la première fois que ce sera nécessaire.",
+            _ => "Du hast noch nichts ausgewählt - du wirst beim ersten Bedarf gefragt."
+        };
+
+        public static string ResetFallbackButton => Current switch
+        {
+            Lang.EL => "↺ Επαναφορά (ρώτα ξανά)",
+            Lang.EN => "↺ Reset (ask again)",
+            Lang.FR => "↺ Réinitialiser (redemander)",
+            _ => "↺ Zurücksetzen (erneut fragen)"
+        };
+
+        public static string GatewayHeader => Current switch
+        {
+            Lang.EL => "Κόμβος Gateway",
+            Lang.EN => "Kombos Gateway",
+            Lang.FR => "Passerelle Kombos",
+            _ => "Kombos-Gateway"
+        };
+
+        public static string GatewayHint => Current switch
+        {
+            Lang.EL => "Τοπική πύλη (σαν OmniRoute) - άλλα εργαλεία (VS Code, Cursor, Claude Code κ.ά.) μπορούν να στέλνουν εδώ αντί απευθείας σε κάποιο provider, και το Κόμβος δρομολογεί αυτόματα σε όποιο δικό σου agent έχει αποθηκευμένο κλειδί, με αυτόματο fallback αν ο πρώτος αποτύχει. Ακούει ΜΟΝΟ στον υπολογιστή σου (127.0.0.1) - ποτέ στο δίκτυο.",
+            Lang.EN => "A local gateway (OmniRoute-style) - other tools (VS Code, Cursor, Claude Code, etc.) can send requests here instead of directly to a provider, and Kombos automatically routes to whichever of your configured agents has a saved key, with automatic fallback if the first one fails. Listens ONLY on this computer (127.0.0.1) - never on the network.",
+            Lang.FR => "Une passerelle locale (façon OmniRoute) - d'autres outils (VS Code, Cursor, Claude Code, etc.) peuvent envoyer leurs requêtes ici au lieu d'un fournisseur direct, et Kombos route automatiquement vers l'un de tes agents configurés ayant une clé enregistrée, avec repli automatique si le premier échoue. N'écoute QUE sur cet ordinateur (127.0.0.1) - jamais sur le réseau.",
+            _ => "Ein lokales Gateway (im Stil von OmniRoute) - andere Tools (VS Code, Cursor, Claude Code usw.) können Anfragen hierher statt direkt an einen Anbieter senden, und Kombos leitet automatisch an einen deiner konfigurierten Agents mit gespeichertem Schlüssel weiter, mit automatischem Fallback, falls der erste fehlschlägt. Lauscht NUR auf diesem Computer (127.0.0.1) - nie im Netzwerk."
+        };
+
+        public static string GatewayEnabledLabel => Current switch
+        {
+            Lang.EL => "Ενεργοποίηση τοπικής πύλης",
+            Lang.EN => "Enable local gateway",
+            Lang.FR => "Activer la passerelle locale",
+            _ => "Lokales Gateway aktivieren"
+        };
+
+        public static string GatewayPortLabel => Current switch
+        {
+            Lang.EL => "Θύρα:",
+            Lang.EN => "Port:",
+            Lang.FR => "Port :",
+            _ => "Port:"
+        };
+
+        public static string GatewayLogLabel => Current switch
+        {
+            Lang.EL => "Τελευταία αιτήματα",
+            Lang.EN => "Recent requests",
+            Lang.FR => "Requêtes récentes",
+            _ => "Letzte Anfragen"
+        };
+
+        public static string GatewayRunning(int port) => Current switch
+        {
+            Lang.EL => $"🟢 Ενεργό: http://127.0.0.1:{port}/v1/chat/completions",
+            Lang.EN => $"🟢 Running: http://127.0.0.1:{port}/v1/chat/completions",
+            Lang.FR => $"🟢 Actif : http://127.0.0.1:{port}/v1/chat/completions",
+            _ => $"🟢 Aktiv: http://127.0.0.1:{port}/v1/chat/completions"
+        };
+
+        public static string GatewayStopped => Current switch
+        {
+            Lang.EL => "⚪ Ανενεργό",
+            Lang.EN => "⚪ Off",
+            Lang.FR => "⚪ Désactivé",
+            _ => "⚪ Aus"
+        };
+
+        public static string GatewayStartFailed(string error) => Current switch
+        {
+            Lang.EL => $"⚠ Απέτυχε η εκκίνηση: {error}",
+            Lang.EN => $"⚠ Failed to start: {error}",
+            Lang.FR => $"⚠ Échec du démarrage : {error}",
+            _ => $"⚠ Start fehlgeschlagen: {error}"
+        };
+
+        public static string GatewayNoRequestsYet => Current switch
+        {
+            Lang.EL => "Κανένα αίτημα ακόμα.",
+            Lang.EN => "No requests yet.",
+            Lang.FR => "Aucune requête pour l'instant.",
+            _ => "Noch keine Anfragen."
         };
 
         public static string UpdatesHeader => Current switch
@@ -1107,6 +1248,45 @@ namespace Kombos.Localization
         public static string VersionHistoryText => Current switch
         {
             Lang.EL =>
+                "v4.8.0 — <b>Αναδίπλωση πλευρικού μενού, όπως στο MotionDeskTop</b>: η \"αναπτυγμένη\" " +
+                "κατάσταση (προεπιλογή) δείχνει τώρα εικονίδιο+ετικέτα σε κάθε κουμπί (Θέμα/Γλώσσα/Εμφάνιση/" +
+                "Artifacts/Projects/Ρυθμίσεις), όχι μόνο γυμνά εικονίδια - η \"διπλωμένη\" κατάσταση παραμένει " +
+                "η γνωστή στενή στήλη μόνο-εικονιδίων· το κουμπί αναδίπλωσης πλέον ζει μέσα στην ίδια στήλη " +
+                "(κάτω από τα εικονίδια) και ακολουθεί αυτόματα το sidebar είτε είναι αριστερά είτε δεξιά, " +
+                "χωρίς πλέον χειροκίνητους υπολογισμούς θέσης μεταξύ στηλών.\n" +
+                "v4.7.0 — Οπτικό & χρηστικότητας πέρασμα: <b>vector εικονίδια</b> αντί για emoji σε chrome " +
+                "παραθύρου, κεντρική εργαλειοθήκη και sidebar (καθαρό στυλ γραμμής) · <b>dark mode σε " +
+                "ουδέτερο ανθρακί #171717</b> (αντί για το προηγούμενο ζεστό καφέ-μαύρο) · <b>αναδίπλωση " +
+                "πλευρικού μενού</b> με κουμπί κάτω από τα εικονίδια, κεντραρισμένο μαζί τους · κουμπιά " +
+                "<b>📋 Επικόλληση</b> στα πεδία κλειδιού API/username/password (ασφαλής εναλλακτική αντί για " +
+                "ανάγνωση αποθηκευμένων κωδικών browser, που αρνηθήκαμε ρητά για λόγους ασφαλείας) · η " +
+                "αυτόματη συνέχιση σε άλλο agent (v4.6.0) έγινε πιο σωστή: pop-up Ναι/Όχι ΤΗΝ ΠΡΩΤΗ ΦΟΡΑ, " +
+                "μετά θυμάται την επιλογή και συνεχίζει αυτόματα χωρίς να ξαναρωτήσει · οι Ρυθμίσεις Agent " +
+                "αναδιοργανώθηκαν σε αναδιπλούμενες ενότητες (λιγότερη συμφόρηση). Ζωντανό τεστ σε πραγματικό " +
+                "instance (UI Automation, χωρίς κλειδιά): Gateway endpoint επιβεβαιώθηκε λειτουργικό άκρη-σε-" +
+                "άκρη· βρέθηκε ότι το Ctrl+Alt+Space (Kombos Anywhere) μπορεί να συγκρούεται σιωπηλά με άλλη " +
+                "εφαρμογή σε ορισμένα μηχανήματα (γνωστό ζήτημα, ανοιχτό για διόρθωση).\n" +
+                "v4.6.0 — Κόμβος Gateway (ρητό αίτημα μετά την «τελική» v4.5.0, εξαίρεση όχι scope creep): " +
+                "νέα τοπική HTTP πύλη, εμπνευσμένη από το ανοιχτού-κώδικα OmniRoute " +
+                "(github.com/diegosouzapw/OmniRoute, MIT) - ένα OpenAI-compatible endpoint " +
+                "(<code>http://127.0.0.1:PORT/v1/chat/completions</code>) που άλλα εργαλεία (VS Code, Cursor, " +
+                "Claude Code κ.ά.) μπορούν να χρησιμοποιήσουν αντί να μιλάνε απευθείας σε κάποιον provider. " +
+                "Δρομολογεί αυτόματα στον κεντρικό agent του Κόμβου, με αυτόματο <b>fallback</b> στον επόμενο " +
+                "ρυθμισμένο agent αν ο πρώτος αποτύχει (rate limit/quota/δίκτυο) - το ίδιο πνεύμα με το " +
+                "\"automatic fallback across 359 providers\" του OmniRoute, αλλά ρυθμισμένο εξ ολοκλήρου μέσα " +
+                "από το ήδη φιλικό GUI του Κόμβου (Ρυθμίσεις → Συμπεριφορά: ένα κουτάκι + μία θύρα), όχι " +
+                ".env αρχεία/CLI/Docker/ξεχωριστό dashboard - αυτό είναι το \"πιο ευχάριστο OmniRoute\" που " +
+                "ζητήθηκε. Ασφάλεια by design: ακούει ΑΠΟΚΛΕΙΣΤΙΚΑ σε 127.0.0.1, ποτέ στο δίκτυο. Καμία " +
+                "γραμμή κώδικα δεν αντιγράφηκε από το OmniRoute (διαφορετική γλώσσα/αρχιτεκτονική - Node.js " +
+                "εκεί, C#/.NET εδώ) - μόνο η ιδέα της ενιαίας τοπικής πύλης με αυτόματο fallback υλοποιήθηκε " +
+                "από την αρχή, χρησιμοποιώντας τα κλειδιά που έχεις ήδη βάλει στο Κόμβος. Μαζί με αυτό, νέα " +
+                "<b>αυτόματη συνέχιση όταν το Claude πλησιάζει/χτυπάει το όριό του</b> - ρητό αίτημα χρήστη: " +
+                "ΤΗΝ ΠΡΩΤΗ ΦΟΡΑ εμφανίζεται pop-up προτείνοντας τον πρώτο ήδη-ρυθμισμένο agent (Ναι/Όχι), και " +
+                "η επιλογή σου θυμάται από εκεί και πέρα - το Κόμβος τραβάει αυτόματα από τον ίδιο agent τις " +
+                "επόμενες φορές, χωρίς να ξαναρωτήσει, ώστε η συζήτηση/project να συνεχίζει απρόσκοπτα. " +
+                "Ρυθμίσεις → Συμπεριφορά έχει το κουτάκι ενεργοποίησης + κουμπί \"Επαναφορά\" για να διαλέξεις " +
+                "διαφορετικό agent αργότερα. Η φούσκα της απάντησης πάντα δείχνει ποιος agent απάντησε στην " +
+                "πραγματικότητα - καμία σιωπηλή/κρυφή εναλλαγή.\n" +
                 "v4.5.0 — ΤΕΛΙΚΗ ΕΚΔΟΣΗ: το Κόμβος ολοκληρώνεται ως πλήρες πολυεργαλείο, καμία έκδοση δεν " +
                 "προγραμματίζεται μετά από αυτή. Μεγάλο κύμα προσθηκών: <b>🔄 Έλεγχος για ενημερώσεις</b> " +
                 "(Ρυθμίσεις → Πληροφορίες, μόνο χειροκίνητα, ποτέ σιωπηλή λήψη/εγκατάσταση) · <b>Εισαγωγή " +
@@ -1304,6 +1484,43 @@ namespace Kombos.Localization
                 "v1.0.0 — Πρώτη πλήρης έκδοση: build/run επιβεβαιωμένο σε Windows, εικονίδιο εφαρμογής, tabs κατηγοριών με πραγματική " +
                 "εναλλαγή περιεχομένου, μενού agents/login στο \"C\" με αποθήκευση κλειδιών ανά εργαλείο.",
             Lang.EN =>
+                "v4.8.0 — <b>Sidebar collapse, MotionDeskTop-style</b>: the \"expanded\" state (default) now " +
+                "shows an icon+label on every button (Theme/Language/Appearance/Artifacts/Projects/Settings) " +
+                "instead of bare icons - the \"collapsed\" state stays the familiar narrow icon-only rail. The " +
+                "collapse button now lives inside that same column (below the icons) and automatically follows " +
+                "the sidebar whether it's on the left or right, no more manual cross-column position math.\n" +
+                "v4.7.0 — Visual & usability pass: <b>vector icons</b> instead of emoji in window chrome, the " +
+                "main toolbar, and the sidebar (clean line-icon style) · <b>dark mode in neutral charcoal " +
+                "#171717</b> (instead of the previous warm brownish-black) · <b>sidebar collapse</b> with a " +
+                "toggle button below the icons, centered with them · <b>📋 Paste</b> buttons on the API " +
+                "key/username/password fields (a safe alternative to reading saved browser passwords, which " +
+                "was explicitly declined for security reasons) · the auto-continue-with-another-agent " +
+                "feature (v4.6.0) got more correct: a Yes/No pop-up the FIRST time, then it remembers the " +
+                "choice and continues automatically without asking again · Agent settings were reorganized " +
+                "into collapsible sections (less clutter). Live-tested on a real running instance (UI " +
+                "Automation, no keys): the Gateway endpoint was confirmed working end-to-end; found that " +
+                "Ctrl+Alt+Space (Kombos Anywhere) can silently conflict with another app on some machines " +
+                "(known issue, open for a fix).\n" +
+                "v4.6.0 — Kombos Gateway (an explicit request after the \"final\" v4.5.0 - an exception, not " +
+                "scope creep): a new local HTTP gateway, inspired by the open-source OmniRoute " +
+                "(github.com/diegosouzapw/OmniRoute, MIT) - an OpenAI-compatible endpoint " +
+                "(<code>http://127.0.0.1:PORT/v1/chat/completions</code>) other tools (VS Code, Cursor, " +
+                "Claude Code, etc.) can point at instead of talking to a provider directly. Routes " +
+                "automatically to Kombos's central agent, with automatic <b>fallback</b> to the next " +
+                "configured agent if the first fails (rate limit/quota/network) - the same spirit as " +
+                "OmniRoute's \"automatic fallback across 359 providers,\" but configured entirely through " +
+                "Kombos's already-friendly GUI (Settings → Behavior: one checkbox + one port), not .env " +
+                "files/a CLI/Docker/a separate dashboard - this is the \"friendlier OmniRoute\" that was " +
+                "asked for. Secure by design: listens ONLY on 127.0.0.1, never on the network. No code was " +
+                "copied from OmniRoute (different language/architecture - Node.js there, C#/.NET here) - " +
+                "only the idea of a single local gateway with automatic fallback was built from scratch, " +
+                "using the keys you've already entered into Kombos. Alongside it, new <b>automatic " +
+                "continuation when Claude nears/hits its limit</b> - explicit user request: the FIRST time, " +
+                "a pop-up proposes the first already-configured agent (Yes/No), and your choice is " +
+                "remembered from then on - Kombos automatically draws on that same agent next time, without " +
+                "asking again, so the conversation/project keeps going uninterrupted. Settings → Behavior has " +
+                "the enable checkbox plus a \"Reset\" button to pick a different agent later. The reply " +
+                "bubble always shows which agent actually answered - no silent/hidden switching.\n" +
                 "v4.5.0 — FINAL VERSION: Kombos is now complete as a multi-tool - no version is planned " +
                 "after this one. A large final wave: <b>🔄 Check for updates</b> (Settings → About, manual " +
                 "only, never a silent download/install) · <b>Import from ChatGPT/Claude.ai</b> (their " +
@@ -1480,6 +1697,21 @@ namespace Kombos.Localization
                 "v1.0.0 — First complete release: confirmed build/run on Windows, app icon, category tabs with real content " +
                 "switching, agent/login menu on \"C\" with per-tool key storage.",
             Lang.FR =>
+                "v4.6.0 — Passerelle Kombos (demande explicite après la v4.5.0 « finale » - une exception, " +
+                "pas un dérapage de périmètre) : une nouvelle passerelle HTTP locale, inspirée du projet " +
+                "open-source OmniRoute (github.com/diegosouzapw/OmniRoute, MIT) - un endpoint compatible " +
+                "OpenAI (<code>http://127.0.0.1:PORT/v1/chat/completions</code>) que d'autres outils (VS " +
+                "Code, Cursor, Claude Code, etc.) peuvent utiliser au lieu de parler directement à un " +
+                "fournisseur. Route automatiquement vers l'agent central de Kombos, avec <b>repli " +
+                "automatique</b> vers l'agent configuré suivant en cas d'échec (limite de débit/quota/" +
+                "réseau) - le même esprit que le « repli automatique sur 359 fournisseurs » d'OmniRoute, " +
+                "mais configuré entièrement via l'interface déjà conviviale de Kombos (Réglages → " +
+                "Comportement : une case à cocher + un port), sans fichiers .env/CLI/Docker/tableau de bord " +
+                "séparé - c'est l'« OmniRoute plus convivial » qui était demandé. Sécurisé par conception : " +
+                "n'écoute QUE sur 127.0.0.1, jamais sur le réseau. Aucun code copié d'OmniRoute (langage/" +
+                "architecture différents - Node.js là-bas, C#/.NET ici) - seule l'idée d'une passerelle " +
+                "locale unique avec repli automatique a été construite de zéro, utilisant les clés déjà " +
+                "saisies dans Kombos.\n" +
                 "v4.5.0 — VERSION FINALE : Kombos est désormais complet en tant que multi-outil - aucune " +
                 "version n'est prévue après celle-ci. Une grande vague finale : <b>🔄 Vérifier les mises à " +
                 "jour</b> (Réglages → À propos, uniquement manuel, jamais de téléchargement/installation " +
@@ -1690,6 +1922,21 @@ namespace Kombos.Localization
                 "v1.0.0 — Première version complète : build/exécution confirmés sous Windows, icône de l'application, onglets de " +
                 "catégorie avec changement de contenu réel, menu agents/connexion sur « C » avec clés par outil.",
             _ =>
+                "v4.6.0 — Kombos-Gateway (eine ausdrückliche Anfrage nach der \"finalen\" v4.5.0 - eine " +
+                "Ausnahme, kein Scope Creep): ein neues lokales HTTP-Gateway, inspiriert vom Open-Source-" +
+                "Projekt OmniRoute (github.com/diegosouzapw/OmniRoute, MIT) - ein OpenAI-kompatibler " +
+                "Endpunkt (<code>http://127.0.0.1:PORT/v1/chat/completions</code>), an den andere Tools " +
+                "(VS Code, Cursor, Claude Code usw.) sich wenden können, statt direkt mit einem Anbieter zu " +
+                "sprechen. Leitet automatisch an Kombos' zentralen Agent weiter, mit automatischem " +
+                "<b>Fallback</b> auf den nächsten konfigurierten Agent bei Fehlschlag (Rate-Limit/Kontingent/" +
+                "Netzwerk) - im selben Geist wie OmniRoutes \"automatischer Fallback über 359 Anbieter\", " +
+                "aber komplett über Kombos' bereits freundliche Oberfläche konfiguriert (Einstellungen → " +
+                "Verhalten: eine Checkbox + ein Port), keine .env-Dateien/CLI/Docker/separates Dashboard - " +
+                "das ist das \"freundlichere OmniRoute\", das gewünscht wurde. Sicher per Design: lauscht NUR " +
+                "auf 127.0.0.1, nie im Netzwerk. Kein Code von OmniRoute übernommen (andere Sprache/" +
+                "Architektur - dort Node.js, hier C#/.NET) - nur die Idee eines einzigen lokalen Gateways mit " +
+                "automatischem Fallback wurde von Grund auf gebaut, unter Verwendung der bereits in Kombos " +
+                "eingegebenen Schlüssel.\n" +
                 "v4.5.0 — FINALE VERSION: Kombos ist jetzt als Multi-Tool vollständig - danach ist keine " +
                 "weitere Version geplant. Eine große letzte Welle: <b>🔄 Nach Updates suchen</b> " +
                 "(Einstellungen → Info, nur manuell, nie stilles Herunterladen/Installieren) · <b>Import von " +
@@ -2887,6 +3134,57 @@ namespace Kombos.Localization
             Lang.EN => "Action",
             Lang.FR => "Action",
             _ => "Aktion"
+        };
+
+        /// <summary>Σύντομες ετικέτες πλευρικού μενού (v4.7.0) - ορατές μόνο όταν το sidebar είναι
+        /// "αναπτυγμένο" (κείμενο + εικονίδιο), κρύβονται στην "διπλωμένη" κατάσταση (μόνο εικονίδιο) - βλ.
+        /// MainWindow.SidebarCollapseButton_Click.</summary>
+        public static string SidebarThemeLabel => Current switch
+        {
+            Lang.EL => "Θέμα",
+            Lang.EN => "Theme",
+            Lang.FR => "Thème",
+            _ => "Design"
+        };
+
+        public static string SidebarLangLabel => Current switch
+        {
+            Lang.EL => "Γλώσσα",
+            Lang.EN => "Language",
+            Lang.FR => "Langue",
+            _ => "Sprache"
+        };
+
+        public static string SidebarAppearanceLabel => Current switch
+        {
+            Lang.EL => "Εμφάνιση",
+            Lang.EN => "Appearance",
+            Lang.FR => "Apparence",
+            _ => "Aussehen"
+        };
+
+        public static string SidebarArtifactsLabel => Current switch
+        {
+            Lang.EL => "Artifacts",
+            Lang.EN => "Artifacts",
+            Lang.FR => "Artefacts",
+            _ => "Artifacts"
+        };
+
+        public static string SidebarProjectsLabel => Current switch
+        {
+            Lang.EL => "Projects",
+            Lang.EN => "Projects",
+            Lang.FR => "Projets",
+            _ => "Projekte"
+        };
+
+        public static string SidebarSettingsLabel => Current switch
+        {
+            Lang.EL => "Ρυθμίσεις",
+            Lang.EN => "Settings",
+            Lang.FR => "Réglages",
+            _ => "Einstellungen"
         };
 
         public static string ThemeToggleLabel => Current switch

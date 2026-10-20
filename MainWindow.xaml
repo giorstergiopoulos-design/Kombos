@@ -31,7 +31,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition x:Name="Col0" Width="56"/>
+                <ColumnDefinition x:Name="Col0" Width="190"/>
                 <ColumnDefinition x:Name="Col1" Width="*"/>
             </Grid.ColumnDefinitions>
 
@@ -47,15 +47,24 @@
                         <TextBlock x:Name="CustomTitleText" Foreground="White" FontSize="12" FontFamily="Bahnschrift" VerticalAlignment="Center"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" WindowChrome.IsHitTestVisibleInChrome="True">
-                        <Button x:Name="MinimizeButton" Content="&#x2013;" Width="42" Height="32" FontSize="14"
+                        <Button x:Name="MinimizeButton" Width="42" Height="32"
                                 Background="Transparent" Foreground="White" BorderThickness="0" Cursor="Hand" Click="MinimizeButton_Click"
-                                AutomationProperties.Name="Ελαχιστοποίηση"/>
-                        <Button x:Name="MaximizeButton" Content="&#x25A1;" Width="42" Height="32" FontSize="11"
+                                AutomationProperties.Name="Ελαχιστοποίηση">
+                            <Path Data="{StaticResource IconMinimize}" Stroke="White" StrokeThickness="1.6"
+                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round" Width="14" Height="14" Stretch="Uniform"/>
+                        </Button>
+                        <Button x:Name="MaximizeButton" Width="42" Height="32"
                                 Background="Transparent" Foreground="White" BorderThickness="0" Cursor="Hand" Click="MaximizeButton_Click"
-                                AutomationProperties.Name="Μεγιστοποίηση"/>
-                        <Button x:Name="CloseButton" Content="&#x2715;" Width="42" Height="32" FontSize="11"
+                                AutomationProperties.Name="Μεγιστοποίηση">
+                            <Path Data="{StaticResource IconMaximize}" Stroke="White" StrokeThickness="1.6"
+                                  StrokeLineJoin="Round" Width="12" Height="12" Stretch="Uniform"/>
+                        </Button>
+                        <Button x:Name="CloseButton" Width="42" Height="32"
                                 Background="Transparent" Foreground="White" BorderThickness="0" Cursor="Hand" Click="CloseButton_Click"
-                                AutomationProperties.Name="Κλείσιμο"/>
+                                AutomationProperties.Name="Κλείσιμο">
+                            <Path Data="{StaticResource IconClose}" Stroke="White" StrokeThickness="1.6"
+                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round" Width="13" Height="13" Stretch="Uniform"/>
+                        </Button>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -90,29 +99,89 @@
                 </MenuItem>
             </Menu>
 
-            <!-- Sidebar -->
+            <!-- Sidebar - v4.8.0: όπως στο MotionDeskTop, "αναπτυγμένο" (προεπιλογή) δείχνει εικονίδιο+ετικέτα
+                 σε κάθε κουμπί, "διπλωμένο" δείχνει μόνο εικονίδιο (στενή 56px στήλη, η παλιά όψη). Κάθε
+                 κουμπί απλώνεται σε όλο το πλάτος της στήλης (HorizontalAlignment=Stretch) ώστε να δουλεύει
+                 και στις δύο καταστάσεις χωρίς ξεχωριστό XAML - η ετικέτα απλώς κρύβεται/εμφανίζεται από το
+                 SidebarCollapseButton_Click. Το ίδιο το εικονίδιο μένει πάντα στην ίδια θέση (μέσα σε 34px
+                 container), οπότε δε μετακινείται όταν η ετικέτα φανεί/κρυφτεί. -->
             <Border x:Name="SidebarBorder" Grid.Row="2" Grid.Column="0" Background="{DynamicResource SidebarBrush}">
-                <StackPanel VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,18,0,0">
-                    <Border x:Name="AvatarBorder" Width="30" Height="30"
+                <StackPanel VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="0,18,0,0">
+                    <Border x:Name="AvatarBorder" Width="30" Height="30" HorizontalAlignment="Left" Margin="13,0,0,0"
                             Cursor="Hand" MouseLeftButtonUp="AvatarBorder_Click" ToolTip="Ρυθμίσεις agents / login"/>
-                    <Button x:Name="ThemeToggleButton" Content="&#127769;" Width="34" Height="34" Margin="0,26,0,6"
+                    <Button x:Name="ThemeToggleButton" Height="34" Margin="0,26,0,6" Padding="0"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                             Click="ThemeToggleButton_Click" ToolTip="Εναλλαγή Light / Dark mode"
-                            Background="Transparent" Foreground="White" BorderThickness="0" FontSize="16" Cursor="Hand"/>
-                    <Button x:Name="LangToggleButton" Content="&#127760;" Width="34" Height="34"
+                            Background="Transparent" Foreground="White" BorderThickness="0" Cursor="Hand">
+                        <StackPanel Orientation="Horizontal">
+                            <Grid Width="34" Height="34"><Path x:Name="ThemeToggleIcon" Data="{StaticResource IconMoon}" Fill="White" Width="16" Height="16" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/></Grid>
+                            <TextBlock x:Name="ThemeToggleLabelText" Foreground="White" FontSize="13" Margin="4,0,12,0" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="LangToggleButton" Height="34" Padding="0"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                             Click="LangToggleButton_Click" ToolTip="Επιλογή γλώσσας"
-                            Background="Transparent" Foreground="White" BorderThickness="0" FontSize="16" Cursor="Hand"/>
-                    <Button x:Name="AppearanceButton" Content="&#127912;" Width="34" Height="34" Margin="0,6,0,0"
+                            Background="Transparent" Foreground="White" BorderThickness="0" Cursor="Hand">
+                        <StackPanel Orientation="Horizontal">
+                            <Grid Width="34" Height="34"><Path Data="{StaticResource IconGlobe}" Stroke="White" StrokeThickness="1.4" Width="17" Height="17" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/></Grid>
+                            <TextBlock x:Name="LangToggleLabelText" Foreground="White" FontSize="13" Margin="4,0,12,0" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="AppearanceButton" Height="34" Margin="0,6,0,0" Padding="0"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                             Click="AppearanceButton_Click" ToolTip="Εμφάνιση / θέματα / skins"
-                            Background="Transparent" Foreground="White" BorderThickness="0" FontSize="16" Cursor="Hand"/>
-                    <Button x:Name="ArtifactsButton" Content="&#129513;" Width="34" Height="34" Margin="0,6,0,0"
+                            Background="Transparent" Foreground="White" BorderThickness="0" Cursor="Hand">
+                        <StackPanel Orientation="Horizontal">
+                            <Grid Width="34" Height="34"><Path Data="{StaticResource IconPalette}" Stroke="White" StrokeThickness="1.3" StrokeLineJoin="Round" Width="17" Height="17" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/></Grid>
+                            <TextBlock x:Name="AppearanceLabelText" Foreground="White" FontSize="13" Margin="4,0,12,0" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="ArtifactsButton" Height="34" Margin="0,6,0,0" Padding="0"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                             Click="ArtifactsButton_Click" ToolTip="Artifacts - μπλοκ κώδικα από όλες τις συζητήσεις"
-                            Background="Transparent" Foreground="White" BorderThickness="0" FontSize="16" Cursor="Hand"/>
-                    <Button x:Name="ProjectsSidebarButton" Content="&#128193;" Width="34" Height="34" Margin="0,6,0,0"
+                            Background="Transparent" Foreground="White" BorderThickness="0" Cursor="Hand">
+                        <StackPanel Orientation="Horizontal">
+                            <Grid Width="34" Height="34"><Path Data="{StaticResource IconLayers}" Stroke="White" StrokeThickness="1.4" StrokeLineJoin="Round" Width="16" Height="16" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/></Grid>
+                            <TextBlock x:Name="ArtifactsLabelText" Foreground="White" FontSize="13" Margin="4,0,12,0" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="ProjectsSidebarButton" Height="34" Margin="0,6,0,0" Padding="0"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                             Click="ProjectsSidebarButton_Click" ToolTip="Projects &amp; Συζητήσεις - τρέχουσες και παλαιότερες"
-                            Background="Transparent" Foreground="White" BorderThickness="0" FontSize="16" Cursor="Hand"/>
-                    <Button x:Name="SettingsGearButton" Content="&#9881;" Width="34" Height="34" Margin="0,6,0,0"
+                            Background="Transparent" Foreground="White" BorderThickness="0" Cursor="Hand">
+                        <StackPanel Orientation="Horizontal">
+                            <Grid Width="34" Height="34"><Path Data="{StaticResource IconFolder}" Stroke="White" StrokeThickness="1.4" StrokeLineJoin="Round" Width="17" Height="17" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/></Grid>
+                            <TextBlock x:Name="ProjectsSidebarLabelText" Foreground="White" FontSize="13" Margin="4,0,12,0" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="SettingsGearButton" Height="34" Margin="0,6,0,0" Padding="0"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                             Click="SettingsGearButton_Click" ToolTip="Ρυθμίσεις εφαρμογής"
-                            Background="Transparent" Foreground="White" BorderThickness="0" FontSize="16" Cursor="Hand"/>
+                            Background="Transparent" Foreground="White" BorderThickness="0" Cursor="Hand">
+                        <StackPanel Orientation="Horizontal">
+                            <Grid Width="34" Height="34"><Path Data="{StaticResource IconGear}" Stroke="White" StrokeThickness="2.3" StrokeStartLineCap="Square" StrokeEndLineCap="Square" Width="18" Height="18" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/></Grid>
+                            <TextBlock x:Name="SettingsGearLabelText" Foreground="White" FontSize="13" Margin="4,0,12,0" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Αναδίπλωση πλευρικού μενού (v4.6.0, αναδιαμορφώθηκε v4.8.0) - τώρα μέσα στην ίδια
+                         StackPanel με τα εικονίδια (κάτω από αυτά), ώστε να μετακινείται μαζί με το sidebar
+                         (αριστερά/δεξιά) και να μη χρειάζεται πλέον χειροκίνητα cross-column margins - και οι
+                         δύο καταστάσεις (190px/56px) έχουν μη-μηδενικό πλάτος, οπότε το κουμπί μένει πάντα
+                         μέσα στα όριά της. Κρύβεται φυσικά στο Windows Classic μαζί με όλο το SidebarBorder. -->
+                    <Button x:Name="SidebarCollapseButton" Width="22" Height="22" Margin="13,16,0,0" Padding="0"
+                            HorizontalAlignment="Left" HorizontalContentAlignment="Center"
+                            Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1" Cursor="Hand"
+                            Click="SidebarCollapseButton_Click" ToolTip="Αναδίπλωση πλευρικού μενού"
+                            AutomationProperties.Name="Αναδίπλωση πλευρικού μενού">
+                        <Path x:Name="SidebarCollapseIcon" Data="{StaticResource IconChevronDown}" Stroke="{DynamicResource InkSoftBrush}"
+                              StrokeThickness="1.6" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
+                              Width="9" Height="9" Stretch="Uniform" RenderTransformOrigin="0.5,0.5">
+                            <Path.RenderTransform>
+                                <RotateTransform Angle="-90"/>
+                            </Path.RenderTransform>
+                        </Path>
+                    </Button>
                 </StackPanel>
             </Border>
 
@@ -237,48 +306,68 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <Button x:Name="AttachButton" Grid.Column="0" Content="&#128206;" Margin="0,0,6,0"
-                                        Width="42" Height="36" FontSize="16" Padding="0" VerticalAlignment="Top" Background="Transparent"
+                                <Button x:Name="AttachButton" Grid.Column="0" Margin="0,0,6,0"
+                                        Width="42" Height="36" Padding="0" VerticalAlignment="Top" Background="Transparent"
                                         BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
                                         Foreground="{DynamicResource InkBrush}" Cursor="Hand"
                                         Click="AttachButton_Click" ToolTip="Επισύναψη αρχείου (εικόνα ή κείμενο/κώδικας - .md, .txt, .json, κ.ά.)"
-                                        AutomationProperties.Name="Επισύναψη αρχείου"/>
-                                <Button x:Name="ThinkingToggleButton" Grid.Column="1" Content="&#129504;" Margin="0,0,6,0"
-                                        Width="42" Height="36" FontSize="16" Padding="0" VerticalAlignment="Top" Background="Transparent"
+                                        AutomationProperties.Name="Επισύναψη αρχείου">
+                                    <Path Data="{StaticResource IconPaperclip}" Stroke="{DynamicResource InkBrush}" StrokeThickness="1.4"
+                                          StrokeStartLineCap="Round" StrokeEndLineCap="Round" Width="16" Height="16" Stretch="Uniform"/>
+                                </Button>
+                                <Button x:Name="ThinkingToggleButton" Grid.Column="1" Margin="0,0,6,0"
+                                        Width="42" Height="36" Padding="0" VerticalAlignment="Top" Background="Transparent"
                                         BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
                                         Foreground="{DynamicResource InkBrush}" Cursor="Hand"
                                         Click="ThinkingToggleButton_Click" ToolTip="Ορατό σκεπτικό (extended thinking) - μόνο Claude"
-                                        AutomationProperties.Name="Ορατό σκεπτικό"/>
-                                <Button x:Name="WebSearchToggleButton" Grid.Column="2" Content="&#127760;" Margin="0,0,6,0"
-                                        Width="42" Height="36" FontSize="16" Padding="0" VerticalAlignment="Top" Background="Transparent"
+                                        AutomationProperties.Name="Ορατό σκεπτικό">
+                                    <Path Data="{StaticResource IconLightbulb}" Stroke="{DynamicResource InkBrush}" StrokeThickness="1.4"
+                                          StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Width="16" Height="16" Stretch="Uniform"/>
+                                </Button>
+                                <Button x:Name="WebSearchToggleButton" Grid.Column="2" Margin="0,0,6,0"
+                                        Width="42" Height="36" Padding="0" VerticalAlignment="Top" Background="Transparent"
                                         BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
                                         Foreground="{DynamicResource InkBrush}" Cursor="Hand"
                                         Click="WebSearchToggleButton_Click" ToolTip="Αναζήτηση στο διαδίκτυο - μόνο Claude"
-                                        AutomationProperties.Name="Αναζήτηση στο διαδίκτυο"/>
-                                <Button x:Name="CompareToggleButton" Grid.Column="3" Content="&#9878;" Margin="0,0,6,0"
-                                        Width="42" Height="36" FontSize="16" Padding="0" VerticalAlignment="Top" Background="Transparent"
+                                        AutomationProperties.Name="Αναζήτηση στο διαδίκτυο">
+                                    <Path Data="{StaticResource IconGlobe}" Stroke="{DynamicResource InkBrush}" StrokeThickness="1.3" Width="17" Height="17" Stretch="Uniform"/>
+                                </Button>
+                                <Button x:Name="CompareToggleButton" Grid.Column="3" Margin="0,0,6,0"
+                                        Width="42" Height="36" Padding="0" VerticalAlignment="Top" Background="Transparent"
                                         BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
                                         Foreground="{DynamicResource InkBrush}" Cursor="Hand"
                                         Click="CompareToggleButton_Click" ToolTip="Σύγκριση απαντήσεων από πολλαπλά agents ταυτόχρονα"
-                                        AutomationProperties.Name="Σύγκριση agents"/>
-                                <Button x:Name="HandoffButton" Grid.Column="4" Content="&#128279;" Margin="0,0,8,0"
-                                        Width="42" Height="36" FontSize="16" Padding="0" VerticalAlignment="Top" Background="Transparent"
+                                        AutomationProperties.Name="Σύγκριση agents">
+                                    <Path Data="{StaticResource IconScale}" Stroke="{DynamicResource InkBrush}" StrokeThickness="1.4"
+                                          StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Width="16" Height="16" Stretch="Uniform"/>
+                                </Button>
+                                <Button x:Name="HandoffButton" Grid.Column="4" Margin="0,0,8,0"
+                                        Width="42" Height="36" Padding="0" VerticalAlignment="Top" Background="Transparent"
                                         BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
                                         Foreground="{DynamicResource InkBrush}" Cursor="Hand"
                                         Click="HandoffButton_Click" ToolTip="Handoff: στείλε το κείμενο σε έναν agent, μετά η απάντησή του σε δεύτερο agent για βελτίωση"
-                                        AutomationProperties.Name="Handoff pipeline"/>
-                                <Button x:Name="PromptLibraryButton" Grid.Column="5" Content="&#128218;" Margin="0,0,8,0"
-                                        Width="42" Height="36" FontSize="16" Padding="0" VerticalAlignment="Top" Background="Transparent"
+                                        AutomationProperties.Name="Handoff pipeline">
+                                    <Path Data="{StaticResource IconLink}" Stroke="{DynamicResource InkBrush}" StrokeThickness="1.5"
+                                          StrokeStartLineCap="Round" StrokeEndLineCap="Round" Width="16" Height="16" Stretch="Uniform"/>
+                                </Button>
+                                <Button x:Name="PromptLibraryButton" Grid.Column="5" Margin="0,0,8,0"
+                                        Width="42" Height="36" Padding="0" VerticalAlignment="Top" Background="Transparent"
                                         BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
                                         Foreground="{DynamicResource InkBrush}" Cursor="Hand"
                                         Click="PromptLibraryButton_Click" ToolTip="Βιβλιοθήκη prompts: έτοιμα σημεία εκκίνησης, μηδενικό κόστος tokens μέχρι να τα στείλεις"
-                                        AutomationProperties.Name="Βιβλιοθήκη prompts"/>
-                                <Button x:Name="MicButton" Grid.Column="6" Content="&#127908;" Margin="0,0,8,0"
-                                        Width="42" Height="36" FontSize="16" Padding="0" VerticalAlignment="Top" Background="Transparent"
+                                        AutomationProperties.Name="Βιβλιοθήκη prompts">
+                                    <Path Data="{StaticResource IconBook}" Stroke="{DynamicResource InkBrush}" StrokeThickness="1.4"
+                                          StrokeLineJoin="Round" Width="16" Height="16" Stretch="Uniform"/>
+                                </Button>
+                                <Button x:Name="MicButton" Grid.Column="6" Margin="0,0,8,0"
+                                        Width="42" Height="36" Padding="0" VerticalAlignment="Top" Background="Transparent"
                                         BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
                                         Foreground="{DynamicResource InkBrush}" Cursor="Hand"
                                         Click="MicButton_Click" ToolTip="Φωνητική εισαγωγή (τοπικά, δωρεάν - πάτησε, μίλα, ξαναπάτησε)"
-                                        AutomationProperties.Name="Φωνητική εισαγωγή"/>
+                                        AutomationProperties.Name="Φωνητική εισαγωγή">
+                                    <Path x:Name="MicIcon" Data="{StaticResource IconMic}" Stroke="{DynamicResource InkBrush}" StrokeThickness="1.4"
+                                          StrokeLineJoin="Round" Fill="Transparent" Width="16" Height="16" Stretch="Uniform"/>
+                                </Button>
                                 <TextBox x:Name="ChatInputBox" Grid.Column="7" Padding="8" VerticalContentAlignment="Top"
                                          Background="{DynamicResource PaperBrush}" Foreground="{DynamicResource InkBrush}"
                                          BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
@@ -322,16 +411,22 @@
                         <StackPanel x:Name="CategoriesPanel"/>
                     </ScrollViewer>
                     <StackPanel x:Name="TilesPagerPanel" Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0" HorizontalAlignment="Center">
-                        <Button x:Name="TilesPageUpButton" Content="&#9650;" Width="30" Height="30" FontSize="11" Margin="0,0,0,6"
+                        <Button x:Name="TilesPageUpButton" Width="30" Height="30" Margin="0,0,0,6"
                                 Background="Transparent" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
                                 Foreground="{DynamicResource InkBrush}" Cursor="Hand" Click="TilesPageUpButton_Click"
-                                ToolTip="Προηγούμενη σελίδα εργαλείων"/>
+                                ToolTip="Προηγούμενη σελίδα εργαλείων">
+                            <Path Data="{StaticResource IconChevronUp}" Stroke="{DynamicResource InkBrush}" StrokeThickness="1.6"
+                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Width="13" Height="13" Stretch="Uniform"/>
+                        </Button>
                         <TextBlock x:Name="TilesPageIndicatorText" FontSize="10" HorizontalAlignment="Center" Margin="0,0,0,6"
                                    Foreground="{DynamicResource InkSoftBrush}"/>
-                        <Button x:Name="TilesPageDownButton" Content="&#9660;" Width="30" Height="30" FontSize="11"
+                        <Button x:Name="TilesPageDownButton" Width="30" Height="30"
                                 Background="Transparent" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
                                 Foreground="{DynamicResource InkBrush}" Cursor="Hand" Click="TilesPageDownButton_Click"
-                                ToolTip="Επόμενη σελίδα εργαλείων"/>
+                                ToolTip="Επόμενη σελίδα εργαλείων">
+                            <Path Data="{StaticResource IconChevronDown}" Stroke="{DynamicResource InkBrush}" StrokeThickness="1.6"
+                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Width="13" Height="13" Stretch="Uniform"/>
+                        </Button>
                     </StackPanel>
                 </Grid>
 
@@ -369,10 +464,12 @@
                             <Button x:Name="BreakdownButton" Content="Ανά εργαλείο &#9662;" Margin="14,0,0,0"
                                     Background="Transparent" BorderThickness="0" FontSize="12" Cursor="Hand"
                                     Foreground="{DynamicResource InkSoftBrush}" Click="BreakdownButton_Click"/>
-                            <Button x:Name="AnalyticsButton" Content="&#128202;" Margin="10,0,0,0" Width="26" Padding="0"
-                                    Background="Transparent" BorderThickness="0" FontSize="13" Cursor="Hand"
-                                    Foreground="{DynamicResource InkSoftBrush}" Click="AnalyticsButton_Click"
-                                    ToolTip="Αναλυτικά χρήσης (τοπικά, ανά συνεδρία)" AutomationProperties.Name="Αναλυτικά χρήσης"/>
+                            <Button x:Name="AnalyticsButton" Margin="10,0,0,0" Width="26" Padding="0"
+                                    Background="Transparent" BorderThickness="0" Cursor="Hand" Click="AnalyticsButton_Click"
+                                    ToolTip="Αναλυτικά χρήσης (τοπικά, ανά συνεδρία)" AutomationProperties.Name="Αναλυτικά χρήσης">
+                                <Path Data="{StaticResource IconBarChart}" Stroke="{DynamicResource InkSoftBrush}" StrokeThickness="1.5"
+                                      StrokeStartLineCap="Round" StrokeLineJoin="Round" Width="15" Height="15" Stretch="Uniform"/>
+                            </Button>
                         </StackPanel>
                     </Grid>
                 </Border>

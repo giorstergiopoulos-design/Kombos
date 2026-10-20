@@ -1,15 +1,21 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Icons.xaml πρέπει να συγχωνεύεται ΕΔΩ - βλ. ίδιο σχόλιο στο Light.xaml. -->
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="Icons.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
 
-    <!-- Επιφάνειες -->
-    <SolidColorBrush x:Key="PaperBrush" Color="#1E1B16"/>
-    <SolidColorBrush x:Key="PanelBrush" Color="#27231D"/>
-    <SolidColorBrush x:Key="SidebarBrush" Color="#14110D"/>
-    <SolidColorBrush x:Key="LineBrush" Color="#3A362D"/>
+    <!-- Επιφάνειες - ουδέτερο ανθρακί γκρι (#171717, ρητό αίτημα χρήστη) αντί για το προηγούμενο ζεστό
+         καφέ-μαύρο, ώστε το βασικό σκούρο θέμα να είναι πιο "neutral charcoal" (στυλ GitHub/VS Code dark)
+         αντί για warm-tinted. Το πορτοκαλί accent (ClaudeBrush) ξεχωρίζει εξίσου καλά πάνω σε ουδέτερο γκρι. -->
+    <SolidColorBrush x:Key="PaperBrush" Color="#171717"/>
+    <SolidColorBrush x:Key="PanelBrush" Color="#212121"/>
+    <SolidColorBrush x:Key="SidebarBrush" Color="#0D0D0D"/>
+    <SolidColorBrush x:Key="LineBrush" Color="#333333"/>
 
     <!-- Κείμενο -->
-    <SolidColorBrush x:Key="InkBrush" Color="#EDE7DA"/>
-    <SolidColorBrush x:Key="InkSoftBrush" Color="#A39C8C"/>
+    <SolidColorBrush x:Key="InkBrush" Color="#EDEDED"/>
+    <SolidColorBrush x:Key="InkSoftBrush" Color="#A3A3A3"/>
 
     <!-- Accent -->
     <SolidColorBrush x:Key="ClaudeBrush" Color="#D97C52"/>

@@ -42,13 +42,13 @@ namespace Kombos
             SettingsAgentLabelText.Text = L.SettingsAgentLabel;
             SettingsKeyLabelText.Text = L.SettingsKeyLabel;
             SetCentralAgentButton.Content = L.SetCentralAgentButton;
-            CustomInstructionsLabelText.Text = L.CustomInstructionsLabel;
+            InstructionsExpander.Header = L.CustomInstructionsLabel;
             CustomInstructionsHintText.Text = L.CustomInstructionsHint;
-            McpServersLabelText.Text = L.McpServersLabel;
+            McpExpander.Header = L.McpServersLabel;
             McpServersHintText.Text = L.McpServersHint;
-            LoginCredentialsLabelText.Text = L.LoginCredentialsLabel;
+            LoginCredentialsExpander.Header = L.LoginCredentialsLabel;
             LoginCredentialsHintText.Text = L.LoginCredentialsHint;
-            HiveMemoryLabelText.Text = L.HiveMemoryLabel;
+            HiveMemoryExpander.Header = L.HiveMemoryLabel;
             HiveMemoryHintText.Text = L.HiveMemoryHint;
             HiveMemoryClearButton.Content = L.HiveMemoryClearButton;
             BuildHiveMemoryList();
@@ -226,6 +226,25 @@ namespace Kombos
         }
 
         private void AgentPasswordBox_LostFocus(object sender, RoutedEventArgs e) => _owner.SaveSettings();
+
+        /// <summary>Κουμπιά επικόλλησης (v4.6.0, εναλλακτικό στην απορριφθείσα ιδέα ανάγνωσης αποθηκευμένων
+        /// κωδικών browser - βλ. συζήτηση) - ο χρήστης αντιγράφει ο ίδιος από το δικό του password manager
+        /// και επικολλά εδώ με ένα κλικ, αντί για Ctrl+V που δεν είναι πάντα προφανές σε PasswordBox.</summary>
+        private void PasteApiKeyButton_Click(object sender, RoutedEventArgs e)
+        {
+            try { AgentApiKeyBox.Password = Clipboard.GetText(); } catch { /* άδειο/μη-κειμενικό πρόχειρο - όχι κρίσιμο */ }
+        }
+
+        private void PasteUsernameButton_Click(object sender, RoutedEventArgs e)
+        {
+            try { AgentUsernameBox.Text = Clipboard.GetText(); AgentUsernameBox_LostFocus(sender, e); }
+            catch { /* άδειο/μη-κειμενικό πρόχειρο - όχι κρίσιμο */ }
+        }
+
+        private void PastePasswordButton_Click(object sender, RoutedEventArgs e)
+        {
+            try { AgentPasswordBox.Password = Clipboard.GetText(); } catch { /* άδειο/μη-κειμενικό πρόχειρο - όχι κρίσιμο */ }
+        }
 
         private void AgentApiKeyBox_PasswordChanged(object sender, RoutedEventArgs e)
         {

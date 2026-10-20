@@ -139,6 +139,16 @@ namespace Kombos
             StartMinimizedHintText.Text = L.StartMinimizedHint;
             SoundOnReplyCheckBox.Content = L.SoundOnReplyLabel;
             HotkeyInfoText.Text = L.HotkeyInfo;
+            AutoContinueCheckBox.Content = L.AutoContinueLabel;
+            AutoContinueHintText.Text = L.AutoContinueHint;
+            ResetFallbackButton.Content = L.ResetFallbackButton;
+            RefreshRememberedFallback();
+            GatewayHeaderText.Text = L.GatewayHeader;
+            GatewayHintText.Text = L.GatewayHint;
+            GatewayEnabledCheckBox.Content = L.GatewayEnabledLabel;
+            GatewayPortLabelText.Text = L.GatewayPortLabel;
+            GatewayLogLabelText.Text = L.GatewayLogLabel;
+            RefreshGatewayStatus();
             PluginsFolderHintText.Text = L.PluginsFolderHint;
             OpenPluginsFolderButton.Content = L.OpenPluginsFolderButton;
             PluginsRestartHintText.Text = L.PluginsRestartHint;
@@ -182,6 +192,93 @@ namespace Kombos
             SoundOnReplyCheckBox.IsChecked = _owner._soundOnReply;
             SoundOnReplyCheckBox.Checked += SoundOnReplyCheckBox_Changed;
             SoundOnReplyCheckBox.Unchecked += SoundOnReplyCheckBox_Changed;
+
+            AutoContinueCheckBox.Checked -= AutoContinueCheckBox_Changed;
+            AutoContinueCheckBox.Unchecked -= AutoContinueCheckBox_Changed;
+            AutoContinueCheckBox.IsChecked = _owner._autoContinueOnClaudeLimit;
+            AutoContinueCheckBox.Checked += AutoContinueCheckBox_Changed;
+            AutoContinueCheckBox.Unchecked += AutoContinueCheckBox_Changed;
+
+            GatewayEnabledCheckBox.Checked -= GatewayEnabledCheckBox_Changed;
+            GatewayEnabledCheckBox.Unchecked -= GatewayEnabledCheckBox_Changed;
+            GatewayEnabledCheckBox.IsChecked = _owner._gatewayEnabled;
+            GatewayEnabledCheckBox.Checked += GatewayEnabledCheckBox_Changed;
+            GatewayEnabledCheckBox.Unchecked += GatewayEnabledCheckBox_Changed;
+            GatewayPortBox.Text = _owner._gatewayPort.ToString();
+        }
+
+        /// <summary>"Κόμβος Gateway" (v4.6.0) - ενημερώνει το endpoint URL/κατάσταση σφάλματος + το log
+        /// τελευταίων αιτημάτων, βλ. Services/GatewayServer.cs.</summary>
+        private void RefreshGatewayStatus()
+        {
+            if (_owner._gatewayEnabled)
+            {
+                GatewayEndpointText.Text = _owner._gatewayStartError != null
+                    ? L.GatewayStartFailed(_owner._gatewayStartError)
+                    : L.GatewayRunning(_owner._gatewayPort);
+            }
+            else
+            {
+                GatewayEndpointText.Text = L.GatewayStopped;
+            }
+
+            GatewayLogPanel.Children.Clear();
+            foreach (var entry in _owner._gatewayLog.Take(10))
+            {
+                var line = new TextBlock
+                {
+                    Text = $"{entry.TimestampUtc.ToLocalTime():HH:mm:ss} · {entry.Agent} · {(entry.Success ? "✓" : "✗ " + entry.Note)}",
+                    FontSize = 10, FontFamily = new System.Windows.Media.FontFamily("Consolas"), Margin = new Thickness(0, 0, 0, 2)
+                };
+                line.SetResourceReference(TextBlock.ForegroundProperty, entry.Success ? "InkSoftBrush" : "InkBrush");
+                GatewayLogPanel.Children.Add(line);
+            }
+            if (_owner._gatewayLog.Count == 0)
+                GatewayLogPanel.Children.Add(new TextBlock { Text = L.GatewayNoRequestsYet, FontSize = 10, Foreground = (Brush)FindResource("InkSoftBrush") });
+        }
+
+        private void AutoContinueCheckBox_Changed(object sender, RoutedEventArgs e)
+        {
+            _owner._autoContinueOnClaudeLimit = AutoContinueCheckBox.IsChecked == true;
+            _owner.SaveSettings();
+        }
+
+        /// <summary>Δείχνει ποιον agent θυμάται το Κόμβος για αυτόματη συνέχιση (v4.6.0) - ή τίποτα αν δεν
+        /// έχει ρωτηθεί ακόμα ο χρήστης. Το κουμπί επαναφοράς τον αφήνει να διαλέξει διαφορετικό agent την
+        /// επόμενη φορά που θα χρειαστεί, αντί να μένει κολλημένος στην πρώτη του επιλογή για πάντα.</summary>
+        private void RefreshRememberedFallback()
+        {
+            bool hasRemembered = !string.IsNullOrEmpty(_owner._rememberedFallbackAgent);
+            RememberedFallbackText.Text = hasRemembered ? L.RememberedFallbackText(_owner._rememberedFallbackAgent) : L.NoRememberedFallback;
+            ResetFallbackButton.Visibility = hasRemembered ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private void ResetFallbackButton_Click(object sender, RoutedEventArgs e)
+        {
+            _owner._rememberedFallbackAgent = "";
+            _owner.SaveSettings();
+            RefreshRememberedFallback();
+        }
+
+        private void GatewayEnabledCheckBox_Changed(object sender, RoutedEventArgs e)
+        {
+            _owner._gatewayEnabled = GatewayEnabledCheckBox.IsChecked == true;
+            _owner.ApplyGatewaySetting();
+            _owner.SaveSettings();
+            RefreshGatewayStatus();
+        }
+
+        private void GatewayPortBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (!int.TryParse(GatewayPortBox.Text, out var port) || port is < 1024 or > 65535)
+            {
+                GatewayPortBox.Text = _owner._gatewayPort.ToString();
+                return;
+            }
+            _owner._gatewayPort = port;
+            _owner.SaveSettings();
+            if (_owner._gatewayEnabled) _owner.ApplyGatewaySetting();
+            RefreshGatewayStatus();
         }
 
         private void SoundOnReplyCheckBox_Changed(object sender, RoutedEventArgs e)

@@ -49,95 +49,137 @@
                     <ComboBox x:Name="AgentSelectCombo" Margin="0,0,0,10" SelectionChanged="AgentSelectCombo_SelectionChanged"/>
                     <TextBlock x:Name="SettingsKeyLabelText" FontSize="11" Margin="0,0,0,4"
                                Foreground="{DynamicResource InkSoftBrush}"/>
-                    <PasswordBox x:Name="AgentApiKeyBox" Padding="5" PasswordChanged="AgentApiKeyBox_PasswordChanged" LostFocus="AgentApiKeyBox_LostFocus"/>
+                    <Grid Margin="0,0,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <PasswordBox x:Name="AgentApiKeyBox" Grid.Column="0" Padding="5" PasswordChanged="AgentApiKeyBox_PasswordChanged" LostFocus="AgentApiKeyBox_LostFocus"/>
+                        <Button x:Name="PasteApiKeyButton" Grid.Column="1" Content="📋" Width="30" Margin="4,0,0,0"
+                                Background="Transparent" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+                                Foreground="{DynamicResource InkBrush}" Cursor="Hand" Click="PasteApiKeyButton_Click"
+                                ToolTip="Επικόλληση από το πρόχειρο" AutomationProperties.Name="Επικόλληση κλειδιού API"/>
+                    </Grid>
                     <TextBlock x:Name="SettingsHintText" TextWrapping="Wrap" FontSize="10.5" Margin="0,10,0,0"
                                Foreground="{DynamicResource InkSoftBrush}"/>
-
-                    <Border BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,1,0,0" Margin="0,16,0,12"/>
-                    <TextBlock x:Name="LoginCredentialsLabelText" FontSize="11" Margin="0,0,0,4"
-                               Foreground="{DynamicResource InkSoftBrush}"/>
-                    <TextBox x:Name="AgentUsernameBox" Padding="5" Margin="0,0,0,6"
-                             Background="{DynamicResource PaperBrush}" Foreground="{DynamicResource InkBrush}"
-                             BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
-                             LostFocus="AgentUsernameBox_LostFocus"/>
-                    <PasswordBox x:Name="AgentPasswordBox" Padding="5" PasswordChanged="AgentPasswordBox_PasswordChanged" LostFocus="AgentPasswordBox_LostFocus"/>
-                    <TextBlock x:Name="LoginCredentialsHintText" TextWrapping="Wrap" FontSize="10" Margin="0,4,0,0"
-                               Foreground="{DynamicResource InkSoftBrush}"/>
-                    <Button x:Name="SetCentralAgentButton" Margin="0,10,0,0" Padding="10" HorizontalContentAlignment="Left"
+                    <Button x:Name="SetCentralAgentButton" Margin="0,12,0,0" Padding="10" HorizontalContentAlignment="Left"
                             Background="Transparent" BorderBrush="{DynamicResource ClaudeBrush}" BorderThickness="1"
                             Foreground="{DynamicResource ClaudeBrush}" Cursor="Hand" Click="SetCentralAgentButton_Click"/>
                     <TextBlock x:Name="CentralAgentStatusText" TextWrapping="Wrap" FontSize="10" Margin="0,4,0,0"
                                Foreground="{DynamicResource InkSoftBrush}"/>
 
-                    <Border BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,1,0,0" Margin="0,16,0,12"/>
-                    <TextBlock x:Name="CustomInstructionsLabelText" FontSize="11" Margin="0,0,0,4"
-                               Foreground="{DynamicResource InkSoftBrush}"/>
-                    <TextBox x:Name="CustomInstructionsBox" Padding="6" MinHeight="70" MaxHeight="160"
-                             AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
-                             Background="{DynamicResource PaperBrush}" Foreground="{DynamicResource InkBrush}"
-                             BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
-                             LostFocus="CustomInstructionsBox_LostFocus"/>
-                    <TextBlock x:Name="CustomInstructionsHintText" TextWrapping="Wrap" FontSize="10" Margin="0,4,0,0"
-                               Foreground="{DynamicResource InkSoftBrush}"/>
+                    <!-- v4.6.0 UX pass: 6 άσχετες μεταξύ τους ενότητες ήταν όλες ανοιχτές σε έναν ατελείωτο
+                         κατάλογο - "υπερσυγκέντρωση" κατά ρητή παρατήρηση χρήστη. Μόνο το πιο συχνά
+                         χρησιμοποιούμενο (κλειδί + ορισμός κεντρικού agent, πάνω) μένει πάντα ορατό· τα
+                         υπόλοιπα διπλώνουν σε Expanders (ίδιο μοτίβο με SettingsWindow → Πληροφορίες), ώστε ο
+                         χρήστης να ανοίγει μόνο ό,τι πραγματικά χρειάζεται τη δεδομένη στιγμή. -->
+                    <Expander x:Name="LoginCredentialsExpander" Margin="0,18,0,0" FontSize="12" FontWeight="Bold"
+                              Foreground="{DynamicResource InkBrush}">
+                        <StackPanel Margin="0,10,0,0">
+                            <Grid Margin="0,0,0,6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox x:Name="AgentUsernameBox" Grid.Column="0" Padding="5"
+                                         Background="{DynamicResource PaperBrush}" Foreground="{DynamicResource InkBrush}"
+                                         BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+                                         LostFocus="AgentUsernameBox_LostFocus"/>
+                                <Button x:Name="PasteUsernameButton" Grid.Column="1" Content="📋" Width="30" Margin="4,0,0,0"
+                                        Background="Transparent" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+                                        Foreground="{DynamicResource InkBrush}" Cursor="Hand" Click="PasteUsernameButton_Click"
+                                        ToolTip="Επικόλληση από το πρόχειρο" AutomationProperties.Name="Επικόλληση username"/>
+                            </Grid>
+                            <Grid Margin="0,0,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <PasswordBox x:Name="AgentPasswordBox" Grid.Column="0" Padding="5" PasswordChanged="AgentPasswordBox_PasswordChanged" LostFocus="AgentPasswordBox_LostFocus"/>
+                                <Button x:Name="PastePasswordButton" Grid.Column="1" Content="📋" Width="30" Margin="4,0,0,0"
+                                        Background="Transparent" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+                                        Foreground="{DynamicResource InkBrush}" Cursor="Hand" Click="PastePasswordButton_Click"
+                                        ToolTip="Επικόλληση από το πρόχειρο" AutomationProperties.Name="Επικόλληση password"/>
+                            </Grid>
+                            <TextBlock x:Name="LoginCredentialsHintText" TextWrapping="Wrap" FontSize="10" Margin="0,4,0,0"
+                                       Foreground="{DynamicResource InkSoftBrush}"/>
+                        </StackPanel>
+                    </Expander>
 
-                    <Border BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,1,0,0" Margin="0,16,0,12"/>
-                    <TextBlock x:Name="PresetsLabelText" FontSize="11" Margin="0,0,0,4"
-                               Foreground="{DynamicResource InkSoftBrush}"/>
-                    <Grid Margin="0,0,0,8">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <ComboBox x:Name="PresetsCombo" Grid.Column="0" SelectionChanged="PresetsCombo_SelectionChanged"/>
-                        <Button x:Name="DeletePresetButton" Grid.Column="1" Content="&#128465;" Width="34" Margin="6,0,0,0"
-                                Background="Transparent" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
-                                Foreground="{DynamicResource InkBrush}" Cursor="Hand" Click="DeletePresetButton_Click"/>
-                    </Grid>
-                    <Button x:Name="SavePresetButton" Padding="8,6" HorizontalContentAlignment="Left" HorizontalAlignment="Left" FontSize="10.5"
-                            Background="Transparent" BorderBrush="{DynamicResource ClaudeBrush}" BorderThickness="1"
-                            Foreground="{DynamicResource ClaudeBrush}" Cursor="Hand" Click="SavePresetButton_Click"/>
-                    <TextBox x:Name="PresetNameBox" Visibility="Collapsed" Margin="0,6,0,0" Padding="5"
-                             Background="{DynamicResource PaperBrush}" Foreground="{DynamicResource InkBrush}"
-                             BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
-                             KeyDown="PresetNameBox_KeyDown" LostFocus="PresetNameBox_LostFocus"/>
-                    <TextBlock x:Name="PresetsHintText" TextWrapping="Wrap" FontSize="10" Margin="0,4,0,0"
-                               Foreground="{DynamicResource InkSoftBrush}"/>
+                    <Expander x:Name="InstructionsExpander" Margin="0,10,0,0" FontSize="12" FontWeight="Bold"
+                              Foreground="{DynamicResource InkBrush}">
+                        <StackPanel Margin="0,10,0,0">
+                            <TextBox x:Name="CustomInstructionsBox" Padding="6" MinHeight="70" MaxHeight="160"
+                                     AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
+                                     Background="{DynamicResource PaperBrush}" Foreground="{DynamicResource InkBrush}"
+                                     BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+                                     LostFocus="CustomInstructionsBox_LostFocus"/>
+                            <TextBlock x:Name="CustomInstructionsHintText" TextWrapping="Wrap" FontSize="10" Margin="0,4,0,12"
+                                       Foreground="{DynamicResource InkSoftBrush}"/>
 
-                    <Border BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,1,0,0" Margin="0,16,0,12"/>
-                    <TextBlock x:Name="McpServersLabelText" FontSize="11" Margin="0,0,0,4"
-                               Foreground="{DynamicResource InkSoftBrush}"/>
-                    <TextBox x:Name="McpServersBox" Padding="6" MinHeight="50" MaxHeight="100"
-                             AcceptsReturn="True" TextWrapping="NoWrap" VerticalScrollBarVisibility="Auto"
-                             HorizontalScrollBarVisibility="Auto" FontFamily="Consolas" FontSize="11"
-                             Background="{DynamicResource PaperBrush}" Foreground="{DynamicResource InkBrush}"
-                             BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
-                             LostFocus="McpServersBox_LostFocus"/>
-                    <TextBlock x:Name="McpServersHintText" TextWrapping="Wrap" FontSize="10" Margin="0,4,0,0"
-                               Foreground="{DynamicResource InkSoftBrush}"/>
+                            <TextBlock x:Name="PresetsLabelText" FontSize="11" Margin="0,0,0,4"
+                                       Foreground="{DynamicResource InkSoftBrush}"/>
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <ComboBox x:Name="PresetsCombo" Grid.Column="0" SelectionChanged="PresetsCombo_SelectionChanged"/>
+                                <Button x:Name="DeletePresetButton" Grid.Column="1" Content="&#128465;" Width="34" Margin="6,0,0,0"
+                                        Background="Transparent" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+                                        Foreground="{DynamicResource InkBrush}" Cursor="Hand" Click="DeletePresetButton_Click"/>
+                            </Grid>
+                            <Button x:Name="SavePresetButton" Padding="8,6" HorizontalContentAlignment="Left" HorizontalAlignment="Left" FontSize="10.5"
+                                    Background="Transparent" BorderBrush="{DynamicResource ClaudeBrush}" BorderThickness="1"
+                                    Foreground="{DynamicResource ClaudeBrush}" Cursor="Hand" Click="SavePresetButton_Click"/>
+                            <TextBox x:Name="PresetNameBox" Visibility="Collapsed" Margin="0,6,0,0" Padding="5"
+                                     Background="{DynamicResource PaperBrush}" Foreground="{DynamicResource InkBrush}"
+                                     BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+                                     KeyDown="PresetNameBox_KeyDown" LostFocus="PresetNameBox_LostFocus"/>
+                            <TextBlock x:Name="PresetsHintText" TextWrapping="Wrap" FontSize="10" Margin="0,4,0,0"
+                                       Foreground="{DynamicResource InkSoftBrush}"/>
+                        </StackPanel>
+                    </Expander>
 
-                    <Border BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,1,0,0" Margin="0,16,0,12"/>
-                    <TextBlock x:Name="HiveMemoryLabelText" FontSize="11" Margin="0,0,0,4"
-                               Foreground="{DynamicResource InkSoftBrush}"/>
-                    <TextBlock x:Name="HiveMemoryHintText" TextWrapping="Wrap" FontSize="10" Margin="0,0,0,8"
-                               Foreground="{DynamicResource InkSoftBrush}"/>
-                    <StackPanel x:Name="HiveMemoryListPanel" Margin="0,0,0,8"/>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBox x:Name="HiveMemoryAddBox" Grid.Column="0" Padding="6" FontSize="11"
-                                 Background="{DynamicResource PaperBrush}" Foreground="{DynamicResource InkBrush}"
-                                 BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
-                                 KeyDown="HiveMemoryAddBox_KeyDown"/>
-                        <Button x:Name="HiveMemoryAddButton" Grid.Column="1" Content="+" Width="34" Margin="6,0,0,0"
-                                Background="Transparent" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
-                                Foreground="{DynamicResource InkBrush}" Cursor="Hand" Click="HiveMemoryAddButton_Click"/>
-                    </Grid>
-                    <Button x:Name="HiveMemoryClearButton" Margin="0,8,0,0" Padding="8,6" HorizontalContentAlignment="Left"
-                            HorizontalAlignment="Left" FontSize="10.5"
-                            Background="Transparent" BorderBrush="#C0392B" BorderThickness="1"
-                            Foreground="#C0392B" Cursor="Hand" Click="HiveMemoryClearButton_Click"/>
+                    <Expander x:Name="McpExpander" Margin="0,10,0,0" FontSize="12" FontWeight="Bold"
+                              Foreground="{DynamicResource InkBrush}">
+                        <StackPanel Margin="0,10,0,0">
+                            <TextBox x:Name="McpServersBox" Padding="6" MinHeight="50" MaxHeight="100"
+                                     AcceptsReturn="True" TextWrapping="NoWrap" VerticalScrollBarVisibility="Auto"
+                                     HorizontalScrollBarVisibility="Auto" FontFamily="Consolas" FontSize="11"
+                                     Background="{DynamicResource PaperBrush}" Foreground="{DynamicResource InkBrush}"
+                                     BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+                                     LostFocus="McpServersBox_LostFocus"/>
+                            <TextBlock x:Name="McpServersHintText" TextWrapping="Wrap" FontSize="10" Margin="0,4,0,0"
+                                       Foreground="{DynamicResource InkSoftBrush}"/>
+                        </StackPanel>
+                    </Expander>
+
+                    <Expander x:Name="HiveMemoryExpander" Margin="0,10,0,0" FontSize="12" FontWeight="Bold"
+                              Foreground="{DynamicResource InkBrush}">
+                        <StackPanel Margin="0,10,0,0">
+                            <TextBlock x:Name="HiveMemoryHintText" TextWrapping="Wrap" FontSize="10" Margin="0,0,0,8"
+                                       Foreground="{DynamicResource InkSoftBrush}"/>
+                            <StackPanel x:Name="HiveMemoryListPanel" Margin="0,0,0,8"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox x:Name="HiveMemoryAddBox" Grid.Column="0" Padding="6" FontSize="11"
+                                         Background="{DynamicResource PaperBrush}" Foreground="{DynamicResource InkBrush}"
+                                         BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+                                         KeyDown="HiveMemoryAddBox_KeyDown"/>
+                                <Button x:Name="HiveMemoryAddButton" Grid.Column="1" Content="+" Width="34" Margin="6,0,0,0"
+                                        Background="Transparent" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+                                        Foreground="{DynamicResource InkBrush}" Cursor="Hand" Click="HiveMemoryAddButton_Click"/>
+                            </Grid>
+                            <Button x:Name="HiveMemoryClearButton" Margin="0,8,0,0" Padding="8,6" HorizontalContentAlignment="Left"
+                                    HorizontalAlignment="Left" FontSize="10.5"
+                                    Background="Transparent" BorderBrush="#C0392B" BorderThickness="1"
+                                    Foreground="#C0392B" Cursor="Hand" Click="HiveMemoryClearButton_Click"/>
+                        </StackPanel>
+                    </Expander>
                 </StackPanel>
             </ScrollViewer>
         </Grid>

@@ -40,6 +40,13 @@ namespace Kombos
         internal List<KombosProject> _projects = new();
         internal List<AgentPreset> _presets = new();
         internal string _updateCheckRepo = "";
+        internal bool _gatewayEnabled = false;
+        internal int _gatewayPort = 8420;
+        internal GatewayServer? _gatewayServer;
+        internal readonly List<GatewayRequestLogEntry> _gatewayLog = new();
+        internal string? _gatewayStartError;
+        internal bool _autoContinueOnClaudeLimit = true;
+        internal string _rememberedFallbackAgent = "";
         internal string? _activeProjectFilterId;
         private string? _pendingNewChatProjectId;
         internal readonly List<UsageRow> _usageRows = new();
@@ -199,12 +206,50 @@ namespace Kombos
         /// <summary>Το skin "Windows Classic" αντικαθιστά την πλευρική μπάρα εικονιδίων με ένα παραδοσιακό
         /// οριζόντιο μενού File/Edit/View/Tools/Help - ζητήθηκε ρητά ώστε η εμπειρία να είναι "ακριβώς όπως
         /// ήταν τότε" (τα Windows της εποχής δεν είχαν κάθετη μπάρα εικονιδίων, είχαν menu bar).</summary>
+        /// <summary>Αναδίπλωση πλευρικού μενού (v4.6.0, ρητό αίτημα χρήστη) - όχι μόνιμη ρύθμιση, μόνο
+        /// κατάσταση της τρέχουσας συνεδρίας (δεν αποθηκεύεται) - ίδιο πνεύμα με μικρό, γρήγορο toggle που
+        /// βρίσκεις σε πολλά σύγχρονα εργαλεία με πλευρική μπάρα εικονιδίων.</summary>
+        /// <summary>false = "αναπτυγμένο" (προεπιλογή): κάθε κουμπί δείχνει εικονίδιο+ετικέτα, όπως στο
+        /// MotionDeskTop (ρητό αίτημα χρήστη, v4.8.0). true = "διπλωμένο": μόνο εικονίδιο, στενή 56px στήλη
+        /// (η παλιά όψη). Δεν κρύβεται πλέον εντελώς (0px) - πάντα υπάρχει τουλάχιστον η στενή στήλη.</summary>
+        private bool _sidebarCollapsed = false;
+        private const double SidebarExpandedWidth = 190;
+        private const double SidebarCollapsedWidth = 56;
+
+        /// <summary>Εφαρμόζει το πλάτος της στήλης που φιλοξενεί την πλευρική μπάρα - Col0 ή Col1, ανάλογα
+        /// με το αν η μπάρα είναι αριστερά ή δεξιά (_sidebarRight, βλ. ApplySidebarPosition). Κεντρικό σημείο
+        /// ώστε το Classic-skin (μηδενικό πλάτος) και το collapse-toggle να μη γράφουν ασυνεπώς τη λάθος στήλη.</summary>
+        private void ApplySidebarWidth()
+        {
+            bool classic = _skin == WindowsSkin.Classic;
+            double width = classic ? 0 : (_sidebarCollapsed ? SidebarCollapsedWidth : SidebarExpandedWidth);
+            if (_sidebarRight) Col1.Width = new GridLength(width);
+            else Col0.Width = new GridLength(width);
+        }
+
+        private void SidebarCollapseButton_Click(object sender, RoutedEventArgs e)
+        {
+            _sidebarCollapsed = !_sidebarCollapsed;
+            ApplySidebarWidth();
+            ((RotateTransform)SidebarCollapseIcon.RenderTransform).Angle = _sidebarCollapsed ? 90 : -90;
+            var labelVisibility = _sidebarCollapsed ? Visibility.Collapsed : Visibility.Visible;
+            ThemeToggleLabelText.Visibility = labelVisibility;
+            LangToggleLabelText.Visibility = labelVisibility;
+            AppearanceLabelText.Visibility = labelVisibility;
+            ArtifactsLabelText.Visibility = labelVisibility;
+            ProjectsSidebarLabelText.Visibility = labelVisibility;
+            SettingsGearLabelText.Visibility = labelVisibility;
+        }
+
         private void ApplySkinChrome()
         {
             bool classic = _skin == WindowsSkin.Classic;
             ClassicMenuBar.Visibility = classic ? Visibility.Visible : Visibility.Collapsed;
             SidebarBorder.Visibility = classic ? Visibility.Collapsed : Visibility.Visible;
-            Col0.Width = new GridLength(classic ? 0 : 56);
+            ApplySidebarWidth();
+            // "Αναδίπλωση πλευρικού μενού" (v4.6.0) δεν έχει νόημα στο Classic - εκεί δεν υπάρχει καθόλου
+            // κάθετη μπάρα εικονιδίων (menu bar αντ' αυτού μόνιμα).
+            SidebarCollapseButton.Visibility = classic ? Visibility.Collapsed : Visibility.Visible;
 
             // "Windows Classic" = τετράγωνες γωνίες ΠΑΝΤΟΥ, όχι μόνο στα κύρια παράθυρα - τα popups (γλώσσα,
             // Artifacts, ανάλυση χρήσης, Handoff, ιστορικό/Projects) είχαν ξεχαστεί και έμεναν στρογγυλεμένα.
@@ -258,6 +303,7 @@ namespace Kombos
             _projects = ProjectsListStore.Load(_conversationsSyncFolder);
             _presets = PresetsStore.Load();
             SetupSyncFolderWatcher();
+            ApplyGatewaySetting();
             _loadedPlugins = PluginLoader.LoadAll(_pluginHost, _disabledPlugins);
             _hiveMemory = HiveMemoryStore.Load();
             RegisterBuiltInSlashCommands();
@@ -326,6 +372,7 @@ namespace Kombos
                 UnregisterGlobalHotkey();
                 Microsoft.Win32.SystemEvents.UserPreferenceChanged -= SystemEvents_UserPreferenceChanged;
                 _syncFolderWatcher?.Dispose();
+                _gatewayServer?.Dispose();
                 LogUsageSessionIfAny();
                 return;
             }
@@ -938,6 +985,10 @@ namespace Kombos
             _conversationsSyncFolder = settings.ConversationsSyncFolder ?? "";
             _activeProjectPath = settings.ActiveProjectPath ?? "";
             _updateCheckRepo = settings.UpdateCheckRepo ?? "";
+            _gatewayEnabled = settings.GatewayEnabled;
+            _gatewayPort = settings.GatewayPort > 0 ? settings.GatewayPort : 8420;
+            _autoContinueOnClaudeLimit = settings.AutoContinueOnClaudeLimit;
+            _rememberedFallbackAgent = settings.RememberedFallbackAgent ?? "";
             _apiKeys.Clear();
             if (settings.ApiKeys != null)
                 foreach (var kv in settings.ApiKeys) _apiKeys[kv.Key] = kv.Value;
@@ -987,6 +1038,10 @@ namespace Kombos
                 ConversationsSyncFolder = _conversationsSyncFolder,
                 ActiveProjectPath = _activeProjectPath,
                 UpdateCheckRepo = _updateCheckRepo,
+                GatewayEnabled = _gatewayEnabled,
+                GatewayPort = _gatewayPort,
+                AutoContinueOnClaudeLimit = _autoContinueOnClaudeLimit,
+                RememberedFallbackAgent = _rememberedFallbackAgent,
                 ApiKeys = new Dictionary<string, string>(_apiKeys),
                 AgentUsernames = new Dictionary<string, string>(_agentUsernames),
                 AgentPasswords = new Dictionary<string, string>(_agentPasswords),
@@ -1011,7 +1066,12 @@ namespace Kombos
             var dict = new ResourceDictionary { Source = uri };
             Application.Current.Resources.MergedDictionaries.Clear();
             Application.Current.Resources.MergedDictionaries.Add(dict);
-            ThemeToggleButton.Content = dark ? "\u2600" : "\U0001F319";
+            // v4.6.0 - vector \u03b5\u03b9\u03ba\u03bf\u03bd\u03af\u03b4\u03b9\u03bf \u03b1\u03bd\u03c4\u03af \u03b3\u03b9\u03b1 emoji: \u03ae\u03bb\u03b9\u03bf\u03c2 (\u03bc\u03cc\u03bd\u03bf \u03c0\u03b5\u03c1\u03af\u03b3\u03c1\u03b1\u03bc\u03bc\u03b1) \u03c3\u03b5 light mode, \u03b3\u03b5\u03bc\u03ac\u03c4\u03bf \u03c6\u03b5\u03b3\u03b3\u03ac\u03c1\u03b9
+            // \u03c3\u03b5 dark mode - \u03af\u03b4\u03b9\u03bf Path element, \u03bc\u03cc\u03bd\u03bf \u03b7 Data/Fill/Stroke \u03b1\u03bb\u03bb\u03ac\u03b6\u03bf\u03c5\u03bd.
+            ThemeToggleIcon.Data = (Geometry)FindResource(dark ? "IconMoon" : "IconSun");
+            ThemeToggleIcon.Fill = dark ? Brushes.White : Brushes.Transparent;
+            ThemeToggleIcon.Stroke = dark ? null : Brushes.White;
+            ThemeToggleIcon.StrokeThickness = dark ? 0 : 1.4;
         }
 
         /// <summary>\u039b\u03cd\u03bd\u03b5\u03b9 \u03c4\u03bf \u03c0\u03c1\u03b1\u03b3\u03bc\u03b1\u03c4\u03b9\u03ba\u03cc Light/Dark \u03b1\u03c0\u03cc \u03c4\u03bf _themeMode (Light/Dark = \u03c7\u03b5\u03b9\u03c1\u03bf\u03ba\u03af\u03bd\u03b7\u03c4\u03bf, System =
@@ -1149,6 +1209,12 @@ namespace Kombos
             HistoryButton.Content = L.HistoryButtonLabel;
             ThemeToggleButton.ToolTip = L.ThemeToggleTooltip;
             LangToggleButton.ToolTip = L.LangToggleTooltip;
+            ThemeToggleLabelText.Text = L.SidebarThemeLabel;
+            LangToggleLabelText.Text = L.SidebarLangLabel;
+            AppearanceLabelText.Text = L.SidebarAppearanceLabel;
+            ArtifactsLabelText.Text = L.SidebarArtifactsLabel;
+            ProjectsSidebarLabelText.Text = L.SidebarProjectsLabel;
+            SettingsGearLabelText.Text = L.SidebarSettingsLabel;
             DetailsOpenBtn.Content = L.OpenFreeVersion;
             DetailsMcpBtn.Content = L.AddToClaudeDesktop;
             DetailsPricingBtn.Content = L.UpgradePlan;
@@ -2904,7 +2970,6 @@ namespace Kombos
             if (_sidebarRight)
             {
                 Col0.Width = new GridLength(1, GridUnitType.Star);
-                Col1.Width = new GridLength(56);
                 Grid.SetColumn(SidebarBorder, 1);
                 Grid.SetColumn(MainContentGrid, 0);
                 Grid.SetColumn(DetailsPanel, 0);
@@ -2912,13 +2977,13 @@ namespace Kombos
             }
             else
             {
-                Col0.Width = new GridLength(56);
                 Col1.Width = new GridLength(1, GridUnitType.Star);
                 Grid.SetColumn(SidebarBorder, 0);
                 Grid.SetColumn(MainContentGrid, 1);
                 Grid.SetColumn(DetailsPanel, 1);
                 DetailsPanel.HorizontalAlignment = HorizontalAlignment.Right;
             }
+            ApplySidebarWidth();
         }
 
         // ---------- Chat ----------
@@ -3325,7 +3390,7 @@ namespace Kombos
             {
                 SpeechService.StopListening();
                 _listening = false;
-                MicButton.Content = "\U0001F3A4";
+                SetMicIconListening(false);
                 return;
             }
 
@@ -3334,7 +3399,7 @@ namespace Kombos
                 Dispatcher.Invoke(() =>
                 {
                     _listening = false;
-                    MicButton.Content = "\U0001F3A4";
+                    SetMicIconListening(false);
                     if (string.IsNullOrWhiteSpace(recognized)) return;
                     ChatInputBox.Text = string.IsNullOrEmpty(ChatInputBox.Text)
                         ? recognized
@@ -3347,11 +3412,29 @@ namespace Kombos
             if (started)
             {
                 _listening = true;
-                MicButton.Content = "\U0001F534"; // κόκκινη κουκκίδα - ακούει
+                SetMicIconListening(true); // κόκκινη κουκκίδα - ακούει
             }
             else
             {
                 MessageBox.Show(this, L.MicUnavailable, L.WindowTitle, MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        /// <summary>v4.6.0 - vector εικονίδιο αντί για emoji: περίγραμμα μικροφώνου όταν αδρανές, γεμάτη
+        /// κόκκινη κουκκίδα όσο ακούει (ίδιο Path element, μόνο η Data/Fill/Stroke αλλάζουν).</summary>
+        private void SetMicIconListening(bool listening)
+        {
+            if (listening)
+            {
+                MicIcon.Data = new EllipseGeometry(new Point(12, 12), 7, 7);
+                MicIcon.Fill = new SolidColorBrush(Color.FromRgb(0xE0, 0x4E, 0x4E));
+                MicIcon.Stroke = null;
+            }
+            else
+            {
+                MicIcon.Data = (Geometry)FindResource("IconMic");
+                MicIcon.Fill = Brushes.Transparent;
+                MicIcon.SetResourceReference(System.Windows.Shapes.Shape.StrokeProperty, "InkBrush");
             }
         }
 
@@ -3719,16 +3802,49 @@ namespace Kombos
             try
             {
                 ClaudeResult result;
+                string? autoContinueAgent = null;
+
                 if (_centralAgentName == "Claude")
                 {
-                    (byte[] Bytes, string MediaType)? image = null;
-                    if (imagePath != null)
+                    // Αυτόματη ΠΡΟΤΑΣΗ (όχι σιωπηλή εναλλαγή) άλλου, ήδη ρυθμισμένου agent όταν το Claude
+                    // πλησιάζει/χτυπάει το όριό του (v4.6.0, ρητό αίτημα χρήστη - βλ. AskAutoContinue: πάντα
+                    // pop-up με Ναι/Όχι, ποτέ σιωπηλή εναλλαγή χωρίς να ρωτηθεί ο χρήστης). Το
+                    // ClaudeSessionBudget είναι δικό μας, δηλωτικό όριο εμφάνισης (όχι πραγματικό Anthropic
+                    // quota) - το πραγματικό rate-limit της Anthropic ανιχνεύεται αντιδραστικά πιο κάτω (HTTP
+                    // 429). "5ωρο rolling window" είναι έννοια του Claude.ai Pro/Max UI, όχι ενός API-key
+                    // client όπως το Κόμβος - το πρακτικό αντίστοιχο εδώ είναι ακριβώς αυτό το 429.
+                    bool nearOwnBudget = _autoContinueOnClaudeLimit && _claudeUsed >= ClaudeSessionBudget * 0.9;
+                    var candidateFallback = nearOwnBudget ? ResolveFallbackAgent(askIfNeeded: true, alreadyFailed: false) : null;
+
+                    if (candidateFallback != null)
                     {
-                        var ext = System.IO.Path.GetExtension(imagePath);
-                        if (ImageMediaTypes.TryGetValue(ext, out var mediaType))
-                            image = (System.IO.File.ReadAllBytes(imagePath), mediaType);
+                        result = await OpenAiCompatibleClient.SendAsync(
+                            candidateFallback.BaseUrl!, candidateFallback.Model!, candidateFallback.ApiKey, BuildSystemPrompt(), BuildEffectiveHistory(), _sendCts.Token);
+                        autoContinueAgent = candidateFallback.Name;
                     }
-                    result = await _claude.SendAsync(BuildSystemPrompt(), BuildEffectiveHistory(), image, _thinkingEnabled, _sendCts.Token, _webSearchEnabled, ParseMcpServers());
+                    else
+                    {
+                        (byte[] Bytes, string MediaType)? image = null;
+                        if (imagePath != null)
+                        {
+                            var ext = System.IO.Path.GetExtension(imagePath);
+                            if (ImageMediaTypes.TryGetValue(ext, out var mediaType))
+                                image = (System.IO.File.ReadAllBytes(imagePath), mediaType);
+                        }
+                        try
+                        {
+                            result = await _claude.SendAsync(BuildSystemPrompt(), BuildEffectiveHistory(), image, _thinkingEnabled, _sendCts.Token, _webSearchEnabled, ParseMcpServers());
+                        }
+                        catch (Exception ex) when (_autoContinueOnClaudeLimit && LooksLikeRateLimit(ex) && !isRegenerate)
+                        {
+                            var fallback = ResolveFallbackAgent(askIfNeeded: true, alreadyFailed: true);
+                            if (fallback == null) throw;
+
+                            result = await OpenAiCompatibleClient.SendAsync(
+                                fallback.BaseUrl!, fallback.Model!, fallback.ApiKey, BuildSystemPrompt(), BuildEffectiveHistory(), _sendCts.Token);
+                            autoContinueAgent = fallback.Name;
+                        }
+                    }
                 }
                 else
                 {
@@ -3754,13 +3870,25 @@ namespace Kombos
 
                 var replyText = ExtractReplyText(result.ReplyText, out var recs);
                 var assistantTurn = new ChatTurn { Role = "assistant", Content = result.ReplyText };
-                AddChatBubble(false, replyText, recs, thinkingText: result.ThinkingText, citations: result.Citations, historyTurn: assistantTurn);
+                var bubbleAgentName = autoContinueAgent != null ? L.AutoContinuedAgentLabel(autoContinueAgent) : null;
+                AddChatBubble(false, replyText, recs, thinkingText: result.ThinkingText, citations: result.Citations, agentName: bubbleAgentName, historyTurn: assistantTurn);
                 _history.Add(assistantTurn);
                 NotifyReplyIfInBackground(replyText);
 
-                _claudeUsed += result.InputTokens + result.OutputTokens;
-                _cacheReadTotal += result.CacheReadInputTokens;
-                _cacheCreationTotal += result.CacheCreationInputTokens;
+                // Όταν η απάντηση ήρθε από fallback agent (auto-continue), τα tokens ανήκουν σε ΕΚΕΙΝΟΝ, όχι
+                // στο δικό-μας UI budget του Claude - αλλιώς θα φαινόταν σαν το Claude να "έτρωγε" κατανάλωση
+                // που ποτέ δεν έκανε.
+                if (autoContinueAgent == null)
+                {
+                    _claudeUsed += result.InputTokens + result.OutputTokens;
+                    _cacheReadTotal += result.CacheReadInputTokens;
+                    _cacheCreationTotal += result.CacheCreationInputTokens;
+                }
+                else
+                {
+                    var row = _usageRows.FirstOrDefault(r => r.Name == autoContinueAgent);
+                    if (row != null) { row.Used += result.InputTokens + result.OutputTokens; row.IsConnected = true; }
+                }
                 UpdateStatusBar();
                 SaveCurrentConversation();
             }
@@ -4387,6 +4515,87 @@ namespace Kombos
             var used = _usageRows.Where(r => r.Used > 0).ToDictionary(r => r.Name, r => r.Used);
             if (used.Count == 0) return;
             UsageLogStore.Append(new UsageLogEntry { TimestampUtc = DateTime.UtcNow.ToString("O"), PerToolTokens = used });
+        }
+
+        /// <summary>"Κόμβος Gateway" (v4.6.0) - ξεκινά/σταματά την τοπική HTTP πύλη ανάλογα με το
+        /// _gatewayEnabled. Καλείται στην εκκίνηση και κάθε φορά που ο χρήστης αλλάζει τη ρύθμιση/θύρα.</summary>
+        internal void ApplyGatewaySetting()
+        {
+            _gatewayServer ??= new GatewayServer(GetGatewayPriorityAgents, OnGatewayRequestLogged);
+            _gatewayServer.Stop();
+            _gatewayStartError = null;
+
+            if (!_gatewayEnabled) return;
+
+            if (!_gatewayServer.TryStart(_gatewayPort, out var error))
+                _gatewayStartError = error;
+        }
+
+        private void OnGatewayRequestLogged(GatewayRequestLogEntry entry)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                _gatewayLog.Insert(0, entry);
+                if (_gatewayLog.Count > 50) _gatewayLog.RemoveAt(_gatewayLog.Count - 1);
+            });
+        }
+
+        /// <summary>Σειρά προτεραιότητας δρομολόγησης για το Gateway: πρώτα ο κεντρικός agent (αν έχει
+        /// κλειδί), μετά όλοι οι υπόλοιποι με αποθηκευμένο κλειδί, με τη σειρά του καταλόγου - ίδιο πνεύμα με
+        /// το automatic-fallback-across-providers του OmniRoute, χωρίς όμως να χρειάζεται δικιά του ρύθμιση:
+        /// χρησιμοποιεί ό,τι κλειδιά έχει ήδη βάλει ο χρήστης στο Κόμβος για τη δική του χρήση.</summary>
+        internal List<GatewayAgentEntry> GetGatewayPriorityAgents()
+        {
+            var ordered = new List<string> { _centralAgentName };
+            ordered.AddRange(Catalog.Tools.Select(t => t.Name).Where(n => n != _centralAgentName));
+            if (!ordered.Contains("Claude")) ordered.Insert(0, "Claude");
+
+            var result = new List<GatewayAgentEntry>();
+            foreach (var name in ordered)
+            {
+                if (!_apiKeys.TryGetValue(name, out var key) || string.IsNullOrWhiteSpace(key)) continue;
+                if (name == "Claude") { result.Add(new GatewayAgentEntry(name, key, null, null)); continue; }
+
+                var tool = Catalog.Tools.FirstOrDefault(t => t.Name == name);
+                if (tool?.OpenAiCompatBaseUrl == null) continue; // δεν έχει πραγματικό chat-completions endpoint
+                result.Add(new GatewayAgentEntry(name, key, tool.OpenAiCompatBaseUrl, tool.OpenAiCompatModel));
+            }
+            return result;
+        }
+
+        /// <summary>Το Anthropic API επιστρέφει HTTP 429 τόσο για πραγματικό rate-limit όσο και για
+        /// εξάντληση quota - ο ClaudeClient ενσωματώνει τον κωδικό στο μήνυμα ως "(429)" (βλ.
+        /// ClaudeClient.SendAsync). Δεν υπάρχει πραγματικό "5ωρο rolling window" σε ένα API-key client (αυτό
+        /// είναι έννοια του Claude.ai Pro/Max UI, όχι του Messages API) - το πρακτικό αντίστοιχο εδώ είναι
+        /// ακριβώς αυτό το 429.</summary>
+        internal static bool LooksLikeRateLimit(Exception ex) => ex.Message.Contains("(429)");
+
+        /// <summary>Ποιος agent θα συνεχίσει τη συζήτηση όταν το Claude πλησιάζει/χτυπάει το όριό του (v4.6.0,
+        /// ρητό αίτημα χρήστη): ΤΗΝ ΠΡΩΤΗ ΦΟΡΑ ρωτάει με pop-up Ναι/Όχι ποιον agent να χρησιμοποιήσει (τον
+        /// πρώτο διαθέσιμο στη σειρά προτεραιότητας του Gateway - βλ. GetGatewayPriorityAgents) και τον
+        /// θυμάται (_rememberedFallbackAgent, αποθηκεύεται). Από εκεί και πέρα τον ξαναχρησιμοποιεί ΑΥΤΟΜΑΤΑ,
+        /// χωρίς να ξαναρωτήσει, ώστε η συζήτηση/project να συνεχίζει απρόσκοπτα - εκτός αν το θυμημένο agent
+        /// δεν έχει πια έγκυρο κλειδί, οπότε ρωτάει ξανά σαν να ήταν η πρώτη φορά.</summary>
+        private GatewayAgentEntry? ResolveFallbackAgent(bool askIfNeeded, bool alreadyFailed)
+        {
+            if (!string.IsNullOrEmpty(_rememberedFallbackAgent))
+            {
+                var remembered = GetGatewayPriorityAgents().FirstOrDefault(a => a.Name == _rememberedFallbackAgent);
+                if (remembered != null) return remembered;
+            }
+
+            if (!askIfNeeded) return null;
+
+            var proposed = GetGatewayPriorityAgents().FirstOrDefault(a => a.Name != "Claude" && a.BaseUrl != null);
+            if (proposed == null) return null;
+
+            var message = alreadyFailed ? L.ClaudeLimitReachedAsk(proposed.Name) : L.ClaudeLimitNearAsk(proposed.Name);
+            if (MessageBox.Show(this, message, L.WindowTitle, MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                return null;
+
+            _rememberedFallbackAgent = proposed.Name;
+            SaveSettings();
+            return proposed;
         }
 
         private AnalyticsWindow? _analyticsWindow;

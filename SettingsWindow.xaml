@@ -215,6 +215,50 @@
                         <Border BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,1,0,0" Margin="0,0,0,12"/>
                         <TextBlock x:Name="HotkeyInfoText" TextWrapping="Wrap" FontSize="10.5"
                                    Foreground="{DynamicResource InkSoftBrush}"/>
+
+                        <Border BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,1,0,0" Margin="0,16,0,12"/>
+                        <CheckBox x:Name="AutoContinueCheckBox" FontSize="12" Margin="0,0,0,4"
+                                  Foreground="{DynamicResource InkBrush}" Checked="AutoContinueCheckBox_Changed"
+                                  Unchecked="AutoContinueCheckBox_Changed"/>
+                        <TextBlock x:Name="AutoContinueHintText" TextWrapping="Wrap" FontSize="10" Margin="0,0,0,4"
+                                   Foreground="{DynamicResource InkSoftBrush}"/>
+                        <Grid Margin="0,4,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock x:Name="RememberedFallbackText" Grid.Column="0" TextWrapping="Wrap" FontSize="10.5"
+                                       VerticalAlignment="Center" Foreground="{DynamicResource ClaudeBrush}"/>
+                            <Button x:Name="ResetFallbackButton" Grid.Column="1" Padding="8,4" FontSize="10"
+                                    Background="Transparent" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+                                    Foreground="{DynamicResource InkBrush}" Cursor="Hand" Click="ResetFallbackButton_Click"/>
+                        </Grid>
+
+                        <Border BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,1,0,0" Margin="0,16,0,12"/>
+                        <TextBlock x:Name="GatewayHeaderText" FontSize="13" FontWeight="Bold" Margin="0,0,0,4"
+                                   Foreground="{DynamicResource InkBrush}"/>
+                        <TextBlock x:Name="GatewayHintText" TextWrapping="Wrap" FontSize="10" Margin="0,0,0,10"
+                                   Foreground="{DynamicResource InkSoftBrush}"/>
+                        <CheckBox x:Name="GatewayEnabledCheckBox" FontSize="12" Margin="0,0,0,8"
+                                  Foreground="{DynamicResource InkBrush}" Checked="GatewayEnabledCheckBox_Changed"
+                                  Unchecked="GatewayEnabledCheckBox_Changed"/>
+                        <Grid Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="90"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock x:Name="GatewayPortLabelText" Grid.Column="0" FontSize="11" VerticalAlignment="Center" Margin="0,0,8,0"
+                                       Foreground="{DynamicResource InkSoftBrush}"/>
+                            <TextBox x:Name="GatewayPortBox" Grid.Column="1" Padding="5" FontSize="11"
+                                     Background="{DynamicResource PaperBrush}" Foreground="{DynamicResource InkBrush}"
+                                     BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+                                     LostFocus="GatewayPortBox_LostFocus"/>
+                        </Grid>
+                        <TextBlock x:Name="GatewayEndpointText" TextWrapping="Wrap" FontSize="10.5" FontFamily="Consolas" Margin="0,0,0,10"
+                                   Foreground="{DynamicResource ClaudeBrush}"/>
+                        <TextBlock x:Name="GatewayLogLabelText" FontSize="10.5" FontWeight="Bold" Margin="0,0,0,4"
+                                   Foreground="{DynamicResource InkSoftBrush}"/>
+                        <StackPanel x:Name="GatewayLogPanel"/>
                     </StackPanel>
 
                     <!-- ================= TAB: ΕΠΕΚΤΑΣΕΙΣ (PLUGINS) ================= -->
