@@ -4,6 +4,10 @@ All notable changes to Kombos, summarized here for GitHub. The full changelog - 
 languages (Greek, English, French, German) - is always available inside the app itself, via the Help panel's
 "Version history" tab.
 
+## v4.8.2 — Splash landing + layout polish
+
+The startup curtain's icon now flies to the exact position and size of the animated icon inside the app (next to the "Κόμβος" title), measured from the real layout. Larger main window (1280x880, min 1040x660) and larger secondary windows (Settings, Agent settings, Accounts, Analytics, Appearance, Conversation viewer, Command palette). Status bar no longer overlaps (shorter task label/progress bar), category tabs wrap instead of showing a clipped scrollbar, dark progress bar.
+
 ## v4.8.1 — Upgrade to .NET 10
 
 The app, the test project and all five plugins now target `net10.0-windows` (requires the .NET 10 Desktop Runtime). The internal `ThemeMode` enum was renamed `AppThemeMode` (it collides with WPF's new `System.Windows.ThemeMode`); the saved settings format is unchanged. Bundled plugins were rebuilt against the new host.

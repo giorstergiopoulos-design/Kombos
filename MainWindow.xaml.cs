@@ -615,37 +615,35 @@ namespace Kombos
 
         private void RunSplashAnimation()
         {
-            // Πραγματική θέση του εικονιδίου+τίτλου στη γραμμή τίτλου (όχι κατ' εκτίμηση συντεταγμένες) -
-            // ώστε το σμίκρυνσμα να προσγειώνεται ακριβώς εκεί, ό,τι κι αν αλλάξει στο layout της γραμμής τίτλου.
-            var brandCenter = TitleBarBrand.TranslatePoint(
-                new Point(TitleBarBrand.ActualWidth / 2, TitleBarBrand.ActualHeight / 2), this);
-            double targetX = brandCenter.X - ActualWidth / 2;
-            double targetY = brandCenter.Y - ActualHeight / 2;
+            // Όπως στο GearWin: το εικονίδιο της κουρτίνας "προσγειώνεται" ακριβώς στη ΘΕΣΗ και το ΜΕΓΕΘΟΣ του
+            // πραγματικού κινούμενου εικονιδίου της εφαρμογής (HeaderIcon, δίπλα στον τίτλο "Κόμβος") - κέντρο και διάσταση διαβάζονται από το
+            // πραγματικό layout, σε συντεταγμένες της ίδιας της κουρτίνας. Ο τίτλος/έκδοση απλώς σβήνουν.
+            SplashOverlay.UpdateLayout();
+            var iconCenter = SplashIcon.TranslatePoint(new Point(SplashIcon.Width / 2, SplashIcon.Height / 2), SplashOverlay);
+            var targetCenter = HeaderIcon.TranslatePoint(new Point(HeaderIcon.Width / 2, HeaderIcon.Height / 2), SplashOverlay);
+            double targetScale = HeaderIcon.Width / SplashIcon.Width;
             var hold = TimeSpan.FromSeconds(0.9);
             var shrink = TimeSpan.FromSeconds(0.7);
-            var afterShrink = hold + shrink;
             var ease = new CubicEase { EasingMode = EasingMode.EaseInOut };
 
-            // Φάση 1 (0 → hold): στατική εμφάνιση σε πλήρες μέγεθος.
-            // Φάση 2 (hold → afterShrink): ορατή σμίκρυνση + μετατόπιση προς τη θέση τίτλου, ΧΩΡΙΣ fade ακόμα.
-            var scaleX = new DoubleAnimation(1, 0.16, shrink) { BeginTime = hold, EasingFunction = ease };
-            var scaleY = new DoubleAnimation(1, 0.16, shrink) { BeginTime = hold, EasingFunction = ease };
-            var transX = new DoubleAnimation(0, targetX, shrink) { BeginTime = hold, EasingFunction = ease };
-            var transY = new DoubleAnimation(0, targetY, shrink) { BeginTime = hold, EasingFunction = ease };
-            // Φάση 3 (μετά το τέλος της σμίκρυνσης): γρήγορο fade για να αποκαλυφθεί η εφαρμογή.
-            var bgFade = new DoubleAnimation(1, 0, TimeSpan.FromSeconds(0.25)) { BeginTime = afterShrink };
-            var contentFade = new DoubleAnimation(1, 0, TimeSpan.FromSeconds(0.2)) { BeginTime = afterShrink };
-            contentFade.Completed += (s, ev) => SplashOverlay.Visibility = Visibility.Collapsed;
+            var scaleX = new DoubleAnimation(1, targetScale, shrink) { BeginTime = hold, EasingFunction = ease };
+            var scaleY = new DoubleAnimation(1, targetScale, shrink) { BeginTime = hold, EasingFunction = ease };
+            var transX = new DoubleAnimation(0, targetCenter.X - iconCenter.X, shrink) { BeginTime = hold, EasingFunction = ease };
+            var transY = new DoubleAnimation(0, targetCenter.Y - iconCenter.Y, shrink) { BeginTime = hold, EasingFunction = ease };
+            // Φόντο και κείμενα σβήνουν όσο το εικονίδιο πετάει, ώστε να αποκαλύπτεται η εφαρμογή από κάτω.
+            var bgFade = new DoubleAnimation(1, 0, shrink) { BeginTime = hold };
+            var textFade = new DoubleAnimation(1, 0, TimeSpan.FromSeconds(0.35)) { BeginTime = hold };
+            scaleY.Completed += (s, ev) => SplashOverlay.Visibility = Visibility.Collapsed;
 
-            // ΔΙΟΡΘΩΣΗ: το animate μέσω Storyboard.SetTarget σε εμφωλευμένα Transform objects (μέλη ενός
-            // TransformGroup) αγνοούνταν σιωπηλά - καμία εξαίρεση, απλά ποτέ δεν εφαρμοζόταν η τιμή. Το
-            // BeginAnimation() απευθείας πάνω στο κάθε Freezable/UIElement είναι αξιόπιστο και δουλεύει.
+            // Το BeginAnimation() απευθείας πάνω στο κάθε Freezable είναι αξιόπιστο (το Storyboard.SetTarget σε
+            // εμφωλευμένα Transform μέσα σε TransformGroup αγνοούνταν σιωπηλά).
             SplashScale.BeginAnimation(ScaleTransform.ScaleXProperty, scaleX);
             SplashScale.BeginAnimation(ScaleTransform.ScaleYProperty, scaleY);
             SplashTranslate.BeginAnimation(TranslateTransform.XProperty, transX);
             SplashTranslate.BeginAnimation(TranslateTransform.YProperty, transY);
             SplashBackgroundBrush.BeginAnimation(SolidColorBrush.OpacityProperty, bgFade);
-            SplashContent.BeginAnimation(UIElement.OpacityProperty, contentFade);
+            SplashTitleText.BeginAnimation(UIElement.OpacityProperty, textFade);
+            SplashVersionText.BeginAnimation(UIElement.OpacityProperty, textFade);
         }
 
         // ---------- Οδηγός πρώτης εκκίνησης (onboarding) ----------
@@ -1909,7 +1907,7 @@ namespace Kombos
                     BorderThickness = new Thickness(1.5),
                     CornerRadius = new CornerRadius(SkinTabRadius),
                     Padding = new Thickness(12, 6, 12, 6),
-                    Margin = new Thickness(0, 0, 8, 0),
+                    Margin = new Thickness(0, 0, 8, 6),
                     Cursor = Cursors.Hand,
                     SnapsToDevicePixels = true,
                     UseLayoutRounding = true
