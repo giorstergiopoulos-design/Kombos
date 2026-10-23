@@ -4,13 +4,13 @@
 ;
 ; Πώς χτίζεται:
 ;   1. dotnet publish ..\Kombos.csproj -c Release -r win-x64 --self-contained false -o ..\publish
-;      (framework-dependent - χρειάζεται .NET 8 Desktop Runtime εγκατεστημένο στον υπολογιστή-στόχο)
+;      (framework-dependent - χρειάζεται .NET 10 Desktop Runtime εγκατεστημένο στον υπολογιστή-στόχο)
 ;   2. Άνοιξε αυτό το αρχείο με τον Inno Setup Compiler (ISCC.exe Kombos.iss) ή πάτησε Compile.
 ;   3. Το KombosSetup-<version>.exe βγαίνει στο installer\output\.
 
 #define MyAppName "Κόμβος"
 #define MyAppNameAscii "Kombos"
-#define MyAppVersion "4.8.0"
+#define MyAppVersion "4.8.1"
 #define MyAppPublisher "Kombos"
 #define MyAppExeName "Kombos.exe"
 #define MyPublishDir "..\publish"

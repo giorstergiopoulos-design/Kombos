@@ -10,7 +10,7 @@ namespace Kombos.Services
         public string Language { get; set; } = "EL";
         public bool IsDark { get; set; } = false;
         /// <summary>"" = παλιά αποθηκευμένα ρυθμίσεις χωρίς αυτό το πεδίο· μεταναστεύει από το IsDark στο LoadSettings.
-        /// Αλλιώς "Light"/"Dark"/"System" (Enum.ToString() του ThemeMode).</summary>
+        /// Αλλιώς "Light"/"Dark"/"System" (Enum.ToString() του AppThemeMode).</summary>
         public string ThemeMode { get; set; } = "";
         /// <summary>"owner/repo" για τον προαιρετικό, χειροκίνητο έλεγχο νέας έκδοσης (v4.5.0) - κενό
         /// σημαίνει "δεν έχει οριστεί ακόμα", ο έλεγχος απλά δεν τρέχει.</summary>

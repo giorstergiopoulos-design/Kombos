@@ -57,7 +57,7 @@ namespace Kombos
         private long _cacheCreationTotal = 0;
 
         private bool _isDark = false;
-        internal ThemeMode _themeMode = ThemeMode.System;
+        internal AppThemeMode _themeMode = AppThemeMode.System;
         private bool _sending = false;
         private string? _pendingImagePath;
         private bool _thinkingEnabled = false;
@@ -1012,11 +1012,11 @@ namespace Kombos
             _onboardingSeen = settings.OnboardingSeen;
             Topmost = _alwaysOnTop;
 
-            // \u03a0\u03b1\u03bb\u03b9\u03ac \u03b1\u03c0\u03bf\u03b8\u03b7\u03ba\u03b5\u03c5\u03bc\u03ad\u03bd\u03b5\u03c2 \u03c1\u03c5\u03b8\u03bc\u03af\u03c3\u03b5\u03b9\u03c2 \u03b4\u03b5\u03bd \u03ad\u03c7\u03bf\u03c5\u03bd ThemeMode - \u03bc\u03b5\u03c4\u03b1\u03bd\u03b1\u03c3\u03c4\u03b5\u03cd\u03b5\u03b9 \u03b1\u03c0\u03cc \u03c4\u03bf IsDark \u03c3\u03b5 \u03c7\u03b5\u03b9\u03c1\u03bf\u03ba\u03af\u03bd\u03b7\u03c4\u03bf
+            // \u03a0\u03b1\u03bb\u03b9\u03ac \u03b1\u03c0\u03bf\u03b8\u03b7\u03ba\u03b5\u03c5\u03bc\u03ad\u03bd\u03b5\u03c2 \u03c1\u03c5\u03b8\u03bc\u03af\u03c3\u03b5\u03b9\u03c2 \u03b4\u03b5\u03bd \u03ad\u03c7\u03bf\u03c5\u03bd AppThemeMode - \u03bc\u03b5\u03c4\u03b1\u03bd\u03b1\u03c3\u03c4\u03b5\u03cd\u03b5\u03b9 \u03b1\u03c0\u03cc \u03c4\u03bf IsDark \u03c3\u03b5 \u03c7\u03b5\u03b9\u03c1\u03bf\u03ba\u03af\u03bd\u03b7\u03c4\u03bf
             // Light/Dark \u03ce\u03c3\u03c4\u03b5 \u03bd\u03b1 \u03bc\u03b7 \u03b3\u03c5\u03c1\u03af\u03c3\u03b5\u03b9 \u03c3\u03b9\u03c9\u03c0\u03b7\u03bb\u03ac \u03ba\u03b1\u03bd\u03b5\u03af\u03c2 \u03c3\u03b5 "\u03a3\u03cd\u03c3\u03c4\u03b7\u03bc\u03b1" \u03c7\u03c9\u03c1\u03af\u03c2 \u03bd\u03b1 \u03c4\u03bf \u03ad\u03c7\u03b5\u03b9 \u03b6\u03b7\u03c4\u03ae\u03c3\u03b5\u03b9.
-            _themeMode = Enum.TryParse<ThemeMode>(settings.ThemeMode, out var tm)
+            _themeMode = Enum.TryParse<AppThemeMode>(settings.ThemeMode, out var tm)
                 ? tm
-                : (settings.IsDark ? ThemeMode.Dark : ThemeMode.Light);
+                : (settings.IsDark ? AppThemeMode.Dark : AppThemeMode.Light);
             ApplyThemeMode();
         }
 
@@ -1082,8 +1082,8 @@ namespace Kombos
         {
             bool dark = _themeMode switch
             {
-                ThemeMode.Dark => true,
-                ThemeMode.Light => false,
+                AppThemeMode.Dark => true,
+                AppThemeMode.Light => false,
                 _ => DetectSystemDarkMode()
             };
             ApplyThemeDictionary(dark);
@@ -1104,7 +1104,7 @@ namespace Kombos
         private void SystemEvents_UserPreferenceChanged(object? sender, Microsoft.Win32.UserPreferenceChangedEventArgs e)
         {
             if (e.Category != Microsoft.Win32.UserPreferenceCategory.General) return;
-            if (_themeMode != ThemeMode.System) return;
+            if (_themeMode != AppThemeMode.System) return;
             Dispatcher.Invoke(ApplyThemeMode);
         }
 
@@ -1113,7 +1113,7 @@ namespace Kombos
         /// \u03c5\u03c0\u03b5\u03c1\u03b9\u03c3\u03c7\u03cd\u03b5\u03b9 \u03c4\u03b7\u03c2 \u03b1\u03c5\u03c4\u03cc\u03bc\u03b1\u03c4\u03b7\u03c2 \u03c0\u03b1\u03c1\u03b1\u03ba\u03bf\u03bb\u03bf\u03cd\u03b8\u03b7\u03c3\u03b7\u03c2 \u03c3\u03c5\u03c3\u03c4\u03ae\u03bc\u03b1\u03c4\u03bf\u03c2.</summary>
         internal void ThemeToggleButton_Click(object sender, RoutedEventArgs e)
         {
-            _themeMode = _isDark ? ThemeMode.Light : ThemeMode.Dark;
+            _themeMode = _isDark ? AppThemeMode.Light : AppThemeMode.Dark;
             ApplyThemeMode();
             SaveSettings();
         }

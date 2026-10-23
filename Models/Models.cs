@@ -20,7 +20,7 @@ namespace Kombos.Models
     /// <summary>Light/Dark ήταν πάντα χειροκίνητο (κουμπί ήλιου/φεγγαριού) - System διαβάζει το πραγματικό
     /// θέμα των Windows (registry AppsUseLightTheme) στην εκκίνηση ΚΑΙ ζωντανά όταν αλλάζει, μέσω
     /// SystemEvents.UserPreferenceChanged (βλ. MainWindow.ApplyThemeMode).</summary>
-    public enum ThemeMode { Light, Dark, System }
+    public enum AppThemeMode { Light, Dark, System }
 
     /// <summary>Ένα έτοιμο σημείο εκκίνησης στη "Βιβλιοθήκη Prompts" (v4.1.0) - επιλογή το γεμίζει στο πεδίο
     /// μηνύματος, μηδενικό κόστος tokens μέχρι να το στείλεις. CategoryKey ταιριάζει με Catalog.Categories.Id

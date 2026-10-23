@@ -4,6 +4,10 @@ All notable changes to Kombos, summarized here for GitHub. The full changelog - 
 languages (Greek, English, French, German) - is always available inside the app itself, via the Help panel's
 "Version history" tab.
 
+## v4.8.1 — Upgrade to .NET 10
+
+The app, the test project and all five plugins now target `net10.0-windows` (requires the .NET 10 Desktop Runtime). The internal `ThemeMode` enum was renamed `AppThemeMode` (it collides with WPF's new `System.Windows.ThemeMode`); the saved settings format is unchanged. Bundled plugins were rebuilt against the new host.
+
 ## v4.8.0 — Sidebar collapse, MotionDeskTop-style
 
 the "expanded" state (default) now shows an icon+label on every button (Theme/Language/Appearance/Artifacts/Projects/Settings) instead of bare icons - the "collapsed" state stays the familiar narrow icon-only rail. The collapse button now lives inside that same column (below the icons) and automatically follows the sidebar whether it's on the left or right, no more manual cross-column position math.

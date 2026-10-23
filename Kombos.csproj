@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <Nullable>enable</Nullable>
@@ -35,12 +35,11 @@
     <Using Remove="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.11" />
     <!-- Φωνή (v4.5.0) - System.Speech.Synthesis (TTS, ανάγνωση απαντήσεων) και System.Speech.Recognition
          (STT, φωνητική εισαγωγή). 100% τοπικό/δωρεάν - χρησιμοποιεί τον ενσωματωμένο μηχανισμό φωνής των
-         Windows, καμία κλήση cloud/API key. Στο .NET 8 (windows-desktop) είναι πλέον ξεχωριστό πακέτο, όχι
+         Windows, καμία κλήση cloud/API key. Στο .NET 10 (windows-desktop) είναι πλέον ξεχωριστό πακέτο, όχι
          built-in όπως στο .NET Framework. -->
-    <PackageReference Include="System.Speech" Version="8.0.0" />
+    <PackageReference Include="System.Speech" Version="10.0.0" />
   </ItemGroup>
 
   <ItemGroup>

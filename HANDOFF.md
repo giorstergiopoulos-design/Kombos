@@ -7,7 +7,7 @@ agent που φέρνει τα κατάλληλα εργαλεία μέσα στ
 μορφές:
 
 1. **Web hub** (artifact, ένα αρχείο) — `free-ai-hub.html`
-2. **WPF desktop εφαρμογή** (πηγαίος κώδικας C#/.NET 8, όχι μεταγλωττισμένη) — `Kombos-wpf-source.zip`
+2. **WPF desktop εφαρμογή** (πηγαίος κώδικας C#/.NET 10, όχι μεταγλωττισμένη) — `Kombos-wpf-source.zip`
 
 ## Ονοματολογία — νομικός έλεγχος
 Το αρχικό όνομα ήταν **"Σήμα"** (= "Signal" στα ελληνικά). Έλεγχος στο web επιβεβαίωσε ότι το
@@ -121,7 +121,7 @@ Sans), Clearbit logo API με onerror fallback σε αρχικό γράμμα, `
 `claude-sonnet-4-6`, χωρίς να χρειάζεται το artifact να στείλει API key — το χειρίζεται το
 claude.ai sandbox).
 
-**WPF app (`Kombos`):** .NET 8, code-behind heavy (χτίστηκε έτσι επίτηδες, όχι πλήρες MVVM,
+**WPF app (`Kombos`):** .NET 10, code-behind heavy (χτίστηκε έτσι επίτηδες, όχι πλήρες MVVM,
 για να μειωθεί το ρίσκο binding errors αφού δεν υπήρχε δυνατότητα compile-test σε αυτό το
 περιβάλλον — **δεν έχει τρέξει ποτέ, χρειάζεται build/έλεγχο σε πραγματικά Windows**). Θέματα
 light/dark μέσω ResourceDictionary swap. `ClaudeClient.cs` καλεί το πραγματικό Anthropic API

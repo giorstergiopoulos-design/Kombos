@@ -1,8 +1,8 @@
 # Κόμβος (Kombos)
 
-WPF (.NET 8) desktop app: hub δωρεάν AI εργαλείων/agents με τον Claude ως κεντρικό agent.
+WPF (.NET 10) desktop app: hub δωρεάν AI εργαλείων/agents με τον Claude ως κεντρικό agent.
 
-**Status (2026-09-03, Windows, .NET 10 SDK targeting net8.0-windows): `dotnet build` → 0
+**Status (2026-09-03, Windows, .NET 10 SDK targeting net10.0-windows): `dotnet build` → 0
 errors/0 warnings· `dotnet run` ανοίγει κανονικά· UI (chat panel, 8 category tabs, tool tiles,
 status bar, light/dark toggle) επιβεβαιώθηκε οπτικά και λειτουργικά.** Ο κώδικας που
 περιγράφεται στο "Γνωστά ανοιχτά θέματα" #1 παρακάτω έγραψε σωστά με την πρώτη, χωρίς ανάγκη
@@ -13,7 +13,7 @@ status bar, light/dark toggle) επιβεβαιώθηκε οπτικά και λ
 dotnet build
 dotnet run
 ```
-Requires .NET 8 SDK on Windows (WPF is Windows-only; `net8.0-windows` target).
+Requires .NET 10 SDK on Windows (WPF is Windows-only; `net10.0-windows` target).
 
 ## Δομή
 - `MainWindow.xaml` / `.xaml.cs` — όλο το UI + λογική (code-behind, όχι MVVM, σκόπιμα απλό)

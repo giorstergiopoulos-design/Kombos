@@ -25,7 +25,7 @@ namespace Kombos.Services
             File.WriteAllText(csprojPath,
                 "<Project Sdk=\"Microsoft.NET.Sdk\">\n" +
                 "  <PropertyGroup>\n" +
-                "    <TargetFramework>net8.0-windows</TargetFramework>\n" +
+                "    <TargetFramework>net10.0-windows</TargetFramework>\n" +
                 "    <Nullable>enable</Nullable>\n" +
                 "    <ImplicitUsings>enable</ImplicitUsings>\n" +
                 "  </PropertyGroup>\n" +

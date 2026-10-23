@@ -90,9 +90,9 @@ namespace Kombos
         {
             _owner._themeMode = _owner._themeMode switch
             {
-                ThemeMode.Light => ThemeMode.Dark,
-                ThemeMode.Dark => ThemeMode.System,
-                _ => ThemeMode.Light
+                AppThemeMode.Light => AppThemeMode.Dark,
+                AppThemeMode.Dark => AppThemeMode.System,
+                _ => AppThemeMode.Light
             };
             _owner.ApplyThemeMode();
             ThemeModeButton.Content = L.ThemeModeButtonText(_owner._themeMode);

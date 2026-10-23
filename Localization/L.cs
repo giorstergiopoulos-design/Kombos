@@ -10,7 +10,7 @@ namespace Kombos.Localization
     public static class L
     {
         public static Lang Current { get; set; } = Lang.EL;
-        public const string AppVersion = "4.8.0";
+        public const string AppVersion = "4.8.1";
 
         public static Lang Next => Current switch
         {
@@ -2594,19 +2594,19 @@ namespace Kombos.Localization
             _ => "Design:"
         };
 
-        public static string ThemeModeButtonText(ThemeMode mode) => (Current, mode) switch
+        public static string ThemeModeButtonText(AppThemeMode mode) => (Current, mode) switch
         {
-            (Lang.EL, ThemeMode.Light) => "☀ Φωτεινό (πάτησε για Σκοτεινό)",
-            (Lang.EL, ThemeMode.Dark) => "🌙 Σκοτεινό (πάτησε για Σύστημα)",
+            (Lang.EL, AppThemeMode.Light) => "☀ Φωτεινό (πάτησε για Σκοτεινό)",
+            (Lang.EL, AppThemeMode.Dark) => "🌙 Σκοτεινό (πάτησε για Σύστημα)",
             (Lang.EL, _) => "🖥 Σύστημα - ακολουθεί Windows (πάτησε για Φωτεινό)",
-            (Lang.EN, ThemeMode.Light) => "☀ Light (click for Dark)",
-            (Lang.EN, ThemeMode.Dark) => "🌙 Dark (click for System)",
+            (Lang.EN, AppThemeMode.Light) => "☀ Light (click for Dark)",
+            (Lang.EN, AppThemeMode.Dark) => "🌙 Dark (click for System)",
             (Lang.EN, _) => "🖥 System - follows Windows (click for Light)",
-            (Lang.FR, ThemeMode.Light) => "☀ Clair (clique pour Sombre)",
-            (Lang.FR, ThemeMode.Dark) => "🌙 Sombre (clique pour Système)",
+            (Lang.FR, AppThemeMode.Light) => "☀ Clair (clique pour Sombre)",
+            (Lang.FR, AppThemeMode.Dark) => "🌙 Sombre (clique pour Système)",
             (Lang.FR, _) => "🖥 Système - suit Windows (clique pour Clair)",
-            (_, ThemeMode.Light) => "☀ Hell (klicken für Dunkel)",
-            (_, ThemeMode.Dark) => "🌙 Dunkel (klicken für System)",
+            (_, AppThemeMode.Light) => "☀ Hell (klicken für Dunkel)",
+            (_, AppThemeMode.Dark) => "🌙 Dunkel (klicken für System)",
             (_, _) => "🖥 System - folgt Windows (klicken für Hell)"
         };
 

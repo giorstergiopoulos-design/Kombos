@@ -53,7 +53,7 @@ tray icon με λειτουργία στο παρασκήνιο, και αυτό
 
 Κατεβάστε το τελευταίο `KombosSetup-*.exe` από τα [Releases](../../releases) και εκτελέστε το. Δεν απαιτεί
 δικαιώματα διαχειριστή· προσφέρει προαιρετική συντόμευση επιφάνειας εργασίας και εκκίνηση με τα Windows.
-Χρειάζεται το [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/8.0). Χρειάζεσαι δικό σου
+Χρειάζεται το [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0). Χρειάζεσαι δικό σου
 κλειδί API (π.χ. από [console.anthropic.com](https://console.anthropic.com)) — μπαίνει στις Ρυθμίσεις → Agent,
 κρυπτογραφημένο τοπικά, ποτέ σε καθαρό κείμενο.
 
@@ -64,7 +64,7 @@ dotnet build
 dotnet run
 ```
 
-Το εκτελέσιμο βγαίνει στο `bin/Debug/net8.0-windows/Kombos.exe`. Για installer:
+Το εκτελέσιμο βγαίνει στο `bin/Debug/net10.0-windows/Kombos.exe`. Για installer:
 
 ```
 dotnet publish Kombos.csproj -c Release -r win-x64 --self-contained false -o publish
@@ -76,7 +76,7 @@ ISCC.exe installer/Kombos.iss
 ### Δομή αποθετηρίου
 
 ```
-Kombos.csproj                   Κύριο project (.NET 8, WPF + WinForms για το tray icon)
+Kombos.csproj                   Κύριο project (.NET 10, WPF + WinForms για το tray icon)
 MainWindow.xaml(.cs)            UI + κύρια λογική chat/κατάλογος
 SettingsWindow / AgentSettingsWindow / AppearanceWindow   Ρυθμίσεις, agents, εμφάνιση
 Themes/                         Light / Dark / Icons (vector εικονίδια)
@@ -129,7 +129,7 @@ See the [screenshot gallery](#στιγμιότυπα-οθόνης--screenshots) 
 
 Download the latest `KombosSetup-*.exe` from [Releases](../../releases) and run it. It needs no
 administrator rights and offers an optional desktop shortcut and start-with-Windows. Requires the
-[.NET 8 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/8.0). You need your own API key
+[.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0). You need your own API key
 (e.g. from [console.anthropic.com](https://console.anthropic.com)) — it goes into Settings → Agent,
 encrypted locally, never stored in plain text.
 
@@ -140,7 +140,7 @@ dotnet build
 dotnet run
 ```
 
-The executable lands in `bin/Debug/net8.0-windows/Kombos.exe`. For the installer:
+The executable lands in `bin/Debug/net10.0-windows/Kombos.exe`. For the installer:
 
 ```
 dotnet publish Kombos.csproj -c Release -r win-x64 --self-contained false -o publish
