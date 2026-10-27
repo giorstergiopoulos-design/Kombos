@@ -39,6 +39,7 @@
          (STT, φωνητική εισαγωγή). 100% τοπικό/δωρεάν - χρησιμοποιεί τον ενσωματωμένο μηχανισμό φωνής των
          Windows, καμία κλήση cloud/API key. Στο .NET 10 (windows-desktop) είναι πλέον ξεχωριστό πακέτο, όχι
          built-in όπως στο .NET Framework. -->
+    <EmbeddedResource Include="Data/suite-apps.json" />
     <PackageReference Include="System.Speech" Version="10.0.0" />
   </ItemGroup>
 

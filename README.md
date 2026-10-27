@@ -36,6 +36,14 @@
 Επίσης: πλήρης μετάφραση σε 4 γλώσσες (Ελληνικά, English, Français, Deutsch), οδηγός πρώτης εκκίνησης,
 tray icon με λειτουργία στο παρασκήνιο, και αυτόματα tests (DPAPI, αποθήκευση ρυθμίσεων/συζητήσεων, Gateway).
 
+### Οδηγός, οικογένεια Opsis και ενημερώσεις (v4.9.0)
+- **Οδηγός καλωσορίσματος** σε κάθε νέα μείζονα/ελάσσονα έκδοση (και από Ρυθμίσεις → Βοήθεια / εικονίδιο tray): Επόμενο/Πίσω, «Να μην εμφανιστεί ξανά», Esc/βελάκια. Όταν κλείνει, μικραίνει και πετάει μέσα στο κινούμενο εικονίδιο της εφαρμογής.
+- **Η οικογένεια Opsis**: κάρτες για τις εφαρμογές της σουίτας με κατάσταση εγκατάστασης (Εγκατεστημένο / Δεν είναι εγκατεστημένο / Διαθέσιμη ενημέρωση), Άνοιγμα, Λήψη και Λεπτομέρειες. Η λήψη ζητά πάντα επιβεβαίωση (αρχείο, μέγεθος, πηγή), επαληθεύει SHA-256 και **αρνείται** σε ασυμφωνία· ο installer δεν εκτελείται ποτέ αυτόματα.
+- **Ειδοποίηση νέας έκδοσης** (tray balloon + μήνυμα μέσα στο παράθυρο), μία φορά ανά έκδοση, με διακόπτη στις Ρυθμίσεις → Ενημερώσεις.
+
+#### Απόρρητο: τι δικτυακά αιτήματα γίνονται
+Καμία τηλεμετρία. Το μόνο: (1) `GET api.github.com/repos/giorstergiopoulos-design/Kombos/releases/latest` μετά από ~30 δευτ. και κάθε 24 ώρες (με ETag), (2) το πολύ μία φορά το 24ωρο το αρχείο καταλόγου `raw.githubusercontent.com/giorstergiopoulos-design/Opsis/master/suite/apps.json` (https, μόνο GitHub, έως 256 KB, επικυρώνεται), (3) όταν ανοίγεις τη βιτρίνα, το `releases/latest` κάθε εφαρμογής της σουίτας. Κάθε αίτημα αποτυγχάνει σιωπηλά αν δεν υπάρχει δίκτυο.
+
 ### Στιγμιότυπα οθόνης / Screenshots
 
 <table>
@@ -120,6 +128,14 @@ with your API keys encrypted locally and no telemetry whatsoever.
 
 Also: full translation in 4 languages (Greek, English, French, German), a first-run guide, a system-tray
 icon with background operation, and automated tests (DPAPI, settings/conversation storage, Gateway).
+
+### Guide, Opsis family and updates (v4.9.0)
+- **Welcome guide** on every new major/minor version (also from Settings → Help or the tray icon): Next/Back, "Don't show again", Esc/arrow keys. When it closes it shrinks and flies into the app's own animated icon.
+- **The Opsis family**: a card per suite app with install state (Installed / Not installed / Update available), Open, Download and Details. Downloads always ask first (file, size, source), verify SHA-256 and **refuse** on mismatch; the installer is never run automatically.
+- **New-version notice** (tray balloon + in-window toast), once per version, with a switch in Settings → Updates.
+
+#### Privacy: what goes over the network
+No telemetry. Only: (1) `GET api.github.com/repos/giorstergiopoulos-design/Kombos/releases/latest` after ~30 s and every 24 h (ETag), (2) at most once a day the catalogue file `raw.githubusercontent.com/giorstergiopoulos-design/Opsis/master/suite/apps.json` (https, GitHub hosts only, max 256 KB, validated), (3) when you open the showcase, each suite app's `releases/latest`. Every request fails silently when offline.
 
 ### Screenshots
 

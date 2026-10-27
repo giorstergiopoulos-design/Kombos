@@ -4,6 +4,14 @@ All notable changes to Kombos, summarized here for GitHub. The full changelog - 
 languages (Greek, English, French, German) - is always available inside the app itself, via the Help panel's
 "Version history" tab.
 
+## v4.9.0 — Welcome guide, Opsis family, update notice
+
+- Welcome guide shown on each new major/minor version (remembered per version, "Don't show again", Esc/arrow keys). It closes by shrinking into the app's animated icon, like the startup curtain.
+- "The Opsis family" showcase (Settings → Help, tray menu, Classic Help menu; offered once after the guide): one card per suite app with install state, Open / Download / Details. Catalogue embedded as fallback, refreshed at most once a day from GitHub (https + GitHub hosts only, 256 KB cap, validated). Downloads need confirmation and a matching SHA-256; the installer is never run automatically.
+- New-version notice: tray balloon + in-window toast, one GitHub request after ~30 s then every 24 h (ETag), once per version, switch in Settings → Updates. The manual "Check for update" now defaults to the Kombos repo and uses proper semver comparison.
+- Four languages (EL/EN/FR/DE) for all new strings; the catalogue's app descriptions exist in Greek and English (other languages fall back to English).
+- `KOMBOS_DATA_DIR` environment variable relocates all app data (used for isolated tests).
+
 ## v4.8.2 — Splash landing + layout polish
 
 The startup curtain's icon now flies to the exact position and size of the animated icon inside the app (next to the "Κόμβος" title), measured from the real layout. Larger main window (1280x880, min 1040x660) and larger secondary windows (Settings, Agent settings, Accounts, Analytics, Appearance, Conversation viewer, Command palette). Status bar no longer overlaps (shorter task label/progress bar), category tabs wrap instead of showing a clipped scrollbar, dark progress bar.

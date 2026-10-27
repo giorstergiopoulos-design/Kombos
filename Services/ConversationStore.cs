@@ -16,7 +16,7 @@ namespace Kombos.Services
     public static class ConversationStore
     {
         private static readonly string DefaultFilePath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Kombos", "conversations.json");
+            AppPaths.Root, "conversations.json");
 
         private static string ResolveFilePath(string? customFolder) =>
             string.IsNullOrWhiteSpace(customFolder) ? DefaultFilePath : Path.Combine(customFolder, "conversations.json");

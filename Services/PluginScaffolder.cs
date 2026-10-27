@@ -11,7 +11,7 @@ namespace Kombos.Services
     public static class PluginScaffolder
     {
         public static string ProjectsRoot => Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Kombos", "plugin-projects");
+            AppPaths.Root, "plugin-projects");
 
         public static string Scaffold(string pluginName, string kombosExePath)
         {

@@ -322,11 +322,18 @@
                                         HorizontalContentAlignment="Left" HorizontalAlignment="Left"
                                         Background="Transparent" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
                                         Foreground="{DynamicResource InkBrush}" Cursor="Hand" Click="ReplayOnboardingButton_Click"/>
+                                <Button x:Name="OpenSuiteButton" Margin="0,6,0,0" Padding="8,6" FontWeight="Normal"
+                                        HorizontalContentAlignment="Left" HorizontalAlignment="Left"
+                                        Background="Transparent" BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
+                                        Foreground="{DynamicResource InkBrush}" Cursor="Hand" Click="OpenSuiteButton_Click"/>
                             </StackPanel>
                         </Expander>
                         <Expander x:Name="UpdatesExpander" Margin="0,10,0,0" FontSize="14" FontWeight="Bold"
                                   Foreground="{DynamicResource InkBrush}">
                             <StackPanel Margin="0,6,0,0">
+                                <CheckBox x:Name="NotifyNewVersionsCheckBox" FontSize="12" FontWeight="Normal" Margin="0,0,0,8"
+                                          Foreground="{DynamicResource InkBrush}" Checked="NotifyNewVersionsCheckBox_Changed"
+                                          Unchecked="NotifyNewVersionsCheckBox_Changed"/>
                                 <TextBlock x:Name="UpdatesHintText" TextWrapping="Wrap" FontSize="10" FontWeight="Normal" Margin="0,0,0,6"
                                            Foreground="{DynamicResource InkSoftBrush}"/>
                                 <TextBox x:Name="UpdateRepoBox" Padding="5" FontSize="10.5" Margin="0,0,0,6"

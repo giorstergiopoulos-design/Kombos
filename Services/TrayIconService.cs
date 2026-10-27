@@ -15,6 +15,9 @@ namespace Kombos.Services
         private readonly ToolStripMenuItem _newChatItem;
         private readonly ToolStripMenuItem _accountsItem;
         private readonly ToolStripMenuItem _exitItem;
+        private ToolStripMenuItem? _guideItem;
+        private ToolStripMenuItem? _suiteItem;
+        private Action? _balloonAction;
 
         public event Action? OpenRequested;
         public event Action? NewChatRequested;
@@ -55,20 +58,45 @@ namespace Kombos.Services
                 ContextMenuStrip = menu
             };
             _icon.DoubleClick += (s, e) => OpenRequested?.Invoke();
-            _icon.BalloonTipClicked += (s, e) => OpenRequested?.Invoke();
+            _icon.BalloonTipClicked += (s, e) =>
+            {
+                var action = _balloonAction; _balloonAction = null;
+                if (action != null) action(); else OpenRequested?.Invoke();
+            };
         }
 
         /// <summary>Ειδοποίηση (balloon) όταν φτάνει απάντηση ενώ το παράθυρο δεν είναι στο προσκήνιο - κλικ
         /// πάνω της φέρνει το Kombos μπροστά, ίδια λογική με διπλό κλικ στο εικονίδιο.</summary>
-        public void ShowNotification(string title, string text)
+        public void ShowNotification(string title, string text, Action? onClick = null)
         {
             try
             {
+                _balloonAction = onClick;
                 _icon.BalloonTipTitle = title;
                 _icon.BalloonTipText = Truncate(text, 240);
                 _icon.ShowBalloonTip(4000);
             }
             catch { /* όχι κρίσιμο αν αποτύχει (π.χ. Focus Assist/Do Not Disturb) */ }
+        }
+
+        /// <summary>Προσθέτει στο μενού του tray τα "Οδηγός καλωσορίσματος" και "Η οικογένεια Opsis" (πριν το Έξοδος).</summary>
+        public void SetExtraItems(string guideText, string suiteText, Action onGuide, Action onSuite)
+        {
+            if (_guideItem != null) { SetExtraTexts(guideText, suiteText); return; }
+            _guideItem = new ToolStripMenuItem(guideText);
+            _suiteItem = new ToolStripMenuItem(suiteText);
+            _guideItem.Click += (s, e) => onGuide();
+            _suiteItem.Click += (s, e) => onSuite();
+            var items = _icon.ContextMenuStrip!.Items;
+            int at = items.IndexOf(_exitItem) - 1; // πριν τον διαχωριστή του Έξοδος
+            items.Insert(at, _guideItem);
+            items.Insert(at + 1, _suiteItem);
+        }
+
+        public void SetExtraTexts(string guideText, string suiteText)
+        {
+            if (_guideItem != null) _guideItem.Text = guideText;
+            if (_suiteItem != null) _suiteItem.Text = suiteText;
         }
 
         /// <summary>Ενημέρωση κειμένων μετά από αλλαγή γλώσσας.</summary>

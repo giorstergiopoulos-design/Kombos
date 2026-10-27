@@ -19,7 +19,8 @@ namespace Kombos.Services
 
         public static async Task<UpdateCheckResult> CheckAsync(string repo, string currentVersion)
         {
-            if (string.IsNullOrWhiteSpace(repo) || !repo.Contains('/'))
+            if (string.IsNullOrWhiteSpace(repo)) repo = SuiteCatalog.Owner + "/Kombos"; // προεπιλογή: το ίδιο το Kombos
+            if (!repo.Contains('/'))
                 return new UpdateCheckResult(false, false, null, null, "no-repo");
 
             try
@@ -36,7 +37,7 @@ namespace Kombos.Services
                 var url = doc.RootElement.TryGetProperty("html_url", out var u) ? u.GetString() : null;
                 var latest = tag.TrimStart('v', 'V');
 
-                bool isNewer = Version.TryParse(latest, out var latestV) && Version.TryParse(currentVersion, out var currentV) && latestV > currentV;
+                bool isNewer = VersionComparer.IsNewer(latest, currentVersion);
                 return new UpdateCheckResult(true, isNewer, latest, url, null);
             }
             catch (Exception ex) { return new UpdateCheckResult(false, false, null, null, ex.Message); }

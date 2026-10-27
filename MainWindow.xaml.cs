@@ -330,6 +330,9 @@ namespace Kombos
                 NewChatButton_Click(this, new RoutedEventArgs());
             });
             _trayIcon.AccountsRequested += () => Dispatcher.Invoke(OpenAccountsWindow);
+            _trayIcon.SetExtraItems(SuiteStrings.WelcomeGuide, SuiteStrings.SuiteTitle,
+                () => Dispatcher.Invoke(() => { ShowAndActivate(); ShowOnboarding(isReplay: true); }),
+                () => Dispatcher.Invoke(() => { ShowAndActivate(); ShowSuite(); }));
             _trayIcon.ExitRequested += () => Dispatcher.Invoke(() =>
             {
                 _reallyExiting = true;
@@ -559,6 +562,18 @@ namespace Kombos
                 e.Handled = true;
                 ToggleFocusMode();
             }
+            else if (OnboardingOverlay.Visibility == Visibility.Visible && (e.Key == Key.Escape || e.Key == Key.Left || e.Key == Key.Right))
+            {
+                e.Handled = true;
+                if (e.Key == Key.Escape) HideOnboarding();
+                else if (e.Key == Key.Left) OnboardingBackButton_Click(sender, e);
+                else OnboardingNextButton_Click(sender, e);
+            }
+            else if (SuiteOverlay.Visibility == Visibility.Visible && e.Key == Key.Escape)
+            {
+                e.Handled = true;
+                HideSuite();
+            }
             else if (e.Key == Key.Escape)
             {
                 if (HistoryPopup.IsOpen) { HistoryPopup.IsOpen = false; e.Handled = true; }
@@ -593,11 +608,12 @@ namespace Kombos
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             RegisterGlobalHotkey();
+            StartUpdateWatcher();
 
             // Ο οδηγός πρώτης χρήσης έχει προτεραιότητα έναντι του "εκκίνηση ελαχιστοποιημένο" - αλλιώς ένας
             // χρήστης που δεν έχει δει ποτέ τον οδηγό θα έμενε για πάντα χωρίς αυτόν (το Window_Loaded τρέχει
             // μία φορά ανά διεργασία, οπότε δεν θα ξαναπροσφερόταν ευκαιρία να εμφανιστεί).
-            if (!_onboardingSeen)
+            if (!_onboardingSeen || GuideDue)
             {
                 ShowOnboarding();
                 return; // το splash (και το "εκκίνηση ελαχιστοποιημένο", αν ισχύει) εφαρμόζονται μετά το κλείσιμο του οδηγού
@@ -657,6 +673,8 @@ namespace Kombos
             _onboardingIsReplay = isReplay;
             _onboardingPageIndex = 0;
             OnboardingSkipButton.Content = L.OnboardingSkip;
+            OnboardingDontShowCheck.Content = SuiteStrings.GuideDontShow;
+            OnboardingDontShowCheck.IsChecked = _guideDontShow;
             RenderOnboardingPage();
             OnboardingOverlay.Visibility = Visibility.Visible;
             // ΔΙΟΡΘΩΣΗ: το AppShellBorder.Opacity (ρύθμιση "Διαφάνεια") καλύπτει ΟΛΟ το παράθυρο, άρα και
@@ -945,20 +963,22 @@ namespace Kombos
 
         private void HideOnboarding()
         {
-            OnboardingOverlay.Visibility = Visibility.Collapsed;
-            AppShellBorder.Opacity = WindowOpacity; // επαναφορά της πραγματικής προτίμησης διαφάνειας του χρήστη
-            if (_onboardingIsReplay) return; // ήδη έχει τρέξει το splash στην πρώτη εκκίνηση - μην το ξανατρέξεις
-
-            _onboardingSeen = true;
+            if (_flyInProgress) return;
+            bool replay = _onboardingIsReplay;
+            _guideDontShow = OnboardingDontShowCheck.IsChecked == true;
+            if (!replay) { _onboardingSeen = true; _guideSeenVersion = GuideMinor; }
             SaveSettings();
 
-            if (_startMinimized)
+            // Ο οδηγός ΔΕΝ εξαφανίζεται απότομα: μικραίνει και πετάει μέσα στο κινούμενο εικονίδιο της εφαρμογής,
+            // όπως η κουρτίνα της εκκίνησης. Σε εκκίνηση, η κουρτίνα (splash) πίσω του σβήνει ταυτόχρονα.
+            FlyIntoHeaderIcon(OnboardingOverlay, OnboardingContent, () =>
             {
+                AppShellBorder.Opacity = WindowOpacity; // επαναφορά της πραγματικής προτίμησης διαφάνειας του χρήστη
+                if (replay) return;
                 SplashOverlay.Visibility = Visibility.Collapsed;
-                Hide();
-                return;
-            }
-            RunSplashAnimation();
+                if (_startMinimized) { Hide(); return; }
+                OfferSuiteOnce();
+            }, replay ? null : SplashOverlay);
         }
 
         // ---------- Settings persistence ----------
@@ -1008,6 +1028,10 @@ namespace Kombos
             _startMinimized = settings.StartMinimized;
             _soundOnReply = settings.SoundOnReply;
             _onboardingSeen = settings.OnboardingSeen;
+            _guideSeenVersion = settings.GuideSeenVersion ?? "";
+            _guideDontShow = settings.GuideDontShow;
+            _suiteOffered = settings.SuiteOffered;
+            _notifyNewVersions = settings.NotifyNewVersions;
             Topmost = _alwaysOnTop;
 
             // \u03a0\u03b1\u03bb\u03b9\u03ac \u03b1\u03c0\u03bf\u03b8\u03b7\u03ba\u03b5\u03c5\u03bc\u03ad\u03bd\u03b5\u03c2 \u03c1\u03c5\u03b8\u03bc\u03af\u03c3\u03b5\u03b9\u03c2 \u03b4\u03b5\u03bd \u03ad\u03c7\u03bf\u03c5\u03bd AppThemeMode - \u03bc\u03b5\u03c4\u03b1\u03bd\u03b1\u03c3\u03c4\u03b5\u03cd\u03b5\u03b9 \u03b1\u03c0\u03cc \u03c4\u03bf IsDark \u03c3\u03b5 \u03c7\u03b5\u03b9\u03c1\u03bf\u03ba\u03af\u03bd\u03b7\u03c4\u03bf
@@ -1049,7 +1073,11 @@ namespace Kombos
                 StartWithWindows = _startWithWindows,
                 StartMinimized = _startMinimized,
                 SoundOnReply = _soundOnReply,
-                OnboardingSeen = _onboardingSeen
+                OnboardingSeen = _onboardingSeen,
+                GuideSeenVersion = _guideSeenVersion,
+                GuideDontShow = _guideDontShow,
+                SuiteOffered = _suiteOffered,
+                NotifyNewVersions = _notifyNewVersions
             });
         }
 
@@ -1228,6 +1256,7 @@ namespace Kombos
             _settingsWindow?.ApplyTexts();
             _appearanceWindow?.ApplyTexts();
             _trayIcon?.ApplyTexts(L.WindowTitle, L.TrayOpen, L.TrayNewChat, L.TrayAccounts, L.TrayExit);
+            _trayIcon?.SetExtraTexts(SuiteStrings.WelcomeGuide, SuiteStrings.SuiteTitle);
             ScrollToBottomButton.ToolTip = L.ScrollToBottomTooltip;
             ToolSearchBox.ToolTip = L.ToolSearchPlaceholder;
             OnboardingSkipButton.Content = L.OnboardingSkip;

@@ -45,7 +45,7 @@ namespace Kombos.Services
     public static class PluginLoader
     {
         public static string PluginsRoot => Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Kombos", "plugins");
+            AppPaths.Root, "plugins");
 
         /// <summary>Επίσημα plugins που έρχονται ΜΑΖΙ με την εγκατάσταση του Kombos (φάκελος PluginsBundled
         /// δίπλα στο .exe) - η πηγή της γκαλερί "Λήψη &amp; Ενσωμάτωση" στις Ρυθμίσεις. "Εγκατάσταση" απλά

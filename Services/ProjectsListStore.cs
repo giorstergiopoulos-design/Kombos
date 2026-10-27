@@ -15,7 +15,7 @@ namespace Kombos.Services
         private static string ResolveFilePath(string? customFolder)
         {
             var folder = string.IsNullOrWhiteSpace(customFolder)
-                ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Kombos")
+                ? Path.Combine(AppPaths.Root)
                 : customFolder;
             return Path.Combine(folder, "projects-list.json");
         }

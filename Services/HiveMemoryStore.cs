@@ -12,7 +12,7 @@ namespace Kombos.Services
     public static class HiveMemoryStore
     {
         public static string FilePath => Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Kombos", "hive-memory.json");
+            AppPaths.Root, "hive-memory.json");
 
         public static List<string> Load()
         {

@@ -40,7 +40,7 @@ namespace Kombos.Services
         };
 
         private static string IndexRoot => Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Kombos", "projects");
+            AppPaths.Root, "projects");
 
         private static string IndexFilePath(string projectRootPath)
         {

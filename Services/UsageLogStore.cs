@@ -16,7 +16,7 @@ namespace Kombos.Services
         private const int MaxEntries = 200;
 
         private static string FilePath => Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Kombos", "usage-log.json");
+            AppPaths.Root, "usage-log.json");
 
         public static List<UsageLogEntry> Load()
         {

@@ -34,7 +34,7 @@ namespace Kombos.Services
                 ?? throw new InvalidOperationException("Η απάντηση της OpenAI δεν περιείχε URL εικόνας.");
 
             var imageBytes = await Http.GetByteArrayAsync(url);
-            var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Kombos", "images");
+            var folder = Path.Combine(AppPaths.Root, "images");
             Directory.CreateDirectory(folder);
             var filePath = Path.Combine(folder, $"{Guid.NewGuid():N}.png");
             await File.WriteAllBytesAsync(filePath, imageBytes);

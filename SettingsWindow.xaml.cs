@@ -156,6 +156,13 @@ namespace Kombos
             HelpExpander.Header = L.HelpHeader;
             HelpBodyText.Text = L.HelpText;
             ReplayOnboardingButton.Content = L.ReplayOnboardingButton;
+            OpenSuiteButton.Content = SuiteStrings.SuiteButton;
+            NotifyNewVersionsCheckBox.Content = SuiteStrings.NotifyNewVersions;
+            NotifyNewVersionsCheckBox.Checked -= NotifyNewVersionsCheckBox_Changed;
+            NotifyNewVersionsCheckBox.Unchecked -= NotifyNewVersionsCheckBox_Changed;
+            NotifyNewVersionsCheckBox.IsChecked = _owner._notifyNewVersions;
+            NotifyNewVersionsCheckBox.Checked += NotifyNewVersionsCheckBox_Changed;
+            NotifyNewVersionsCheckBox.Unchecked += NotifyNewVersionsCheckBox_Changed;
             UpdatesExpander.Header = L.UpdatesHeader;
             UpdatesHintText.Text = L.UpdatesHint;
             UpdateRepoBox.Text = _owner._updateCheckRepo;
@@ -519,6 +526,18 @@ namespace Kombos
 
                 GalleryListPanel.Children.Add(row);
             }
+        }
+
+        private void OpenSuiteButton_Click(object sender, RoutedEventArgs e)
+        {
+            _owner.ShowSuite();
+            Close();
+        }
+
+        private void NotifyNewVersionsCheckBox_Changed(object sender, RoutedEventArgs e)
+        {
+            _owner._notifyNewVersions = NotifyNewVersionsCheckBox.IsChecked == true;
+            _owner.SaveSettings();
         }
 
         private void ReplayOnboardingButton_Click(object sender, RoutedEventArgs e)

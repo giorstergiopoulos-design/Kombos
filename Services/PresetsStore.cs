@@ -13,7 +13,7 @@ namespace Kombos.Services
     public static class PresetsStore
     {
         private static string ResolveFilePath() => Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Kombos", "presets-list.json");
+            AppPaths.Root, "presets-list.json");
 
         public static List<AgentPreset> Load()
         {

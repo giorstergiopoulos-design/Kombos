@@ -39,6 +39,13 @@ namespace Kombos.Services
         public bool StartMinimized { get; set; } = false;
         public bool SoundOnReply { get; set; } = false;
         public bool OnboardingSeen { get; set; } = false;
+        /// <summary>Οδηγός καλωσορίσματος (v4.9.0): η τελευταία "major.minor" έκδοση για την οποία εμφανίστηκε.</summary>
+        public string GuideSeenVersion { get; set; } = "";
+        public bool GuideDontShow { get; set; } = false;
+        /// <summary>Η βιτρίνα "Οικογένεια Opsis" προσφέρθηκε ήδη μία φορά μετά τον οδηγό.</summary>
+        public bool SuiteOffered { get; set; } = false;
+        /// <summary>Αυτόματη ειδοποίηση για νέες εκδόσεις (1 έλεγχος GitHub / 24ωρο).</summary>
+        public bool NotifyNewVersions { get; set; } = true;
         public string CustomInstructions { get; set; } = "";
         /// <summary>Απομακρυσμένοι MCP servers, μία γραμμή ανά server με μορφή "όνομα|https://url" - μόνο για
         /// τον Claude (mcp_servers param του Messages API). Απλή μορφή αντί για πλήρες UI λίστας, σκόπιμα.</summary>
@@ -69,7 +76,7 @@ namespace Kombos.Services
     public static class SettingsStore
     {
         private static readonly string FilePath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Kombos", "settings.json");
+            AppPaths.Root, "settings.json");
 
         public static AppSettings Load()
         {
