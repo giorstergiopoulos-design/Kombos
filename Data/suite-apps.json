@@ -16,7 +16,9 @@
       ],
       "tagline": {
         "en": "Desktop customisation for Windows 11",
-        "el": "Εξατομίκευση επιφάνειας εργασίας για Windows 11"
+        "el": "Εξατομίκευση επιφάνειας εργασίας για Windows 11",
+        "fr": "Personnalisation du bureau pour Windows 11",
+        "de": "Desktop-Anpassung für Windows 11"
       },
       "capabilities": {
         "en": [
@@ -32,6 +34,20 @@
           "DeskStrip dock και DeskContainers (ομάδες σαν Fences)",
           "Equalizer 10 ζωνών για όλο το σύστημα μέσω Equalizer APO",
           "Plugins: News Crawler, Appearance και άλλα"
+        ],
+        "fr": [
+          "Fonds d'écran animés et vidéo derrière vos icônes (aussi sous Windows 11 24H2+)",
+          "Widgets : moniteur système, horloge, météo, réseau, disque",
+          "Dock DeskStrip et DeskContainers (groupes façon Fences)",
+          "Égaliseur 10 bandes pour tout le système via Equalizer APO",
+          "Plugins : News Crawler, Appearance et plus"
+        ],
+        "de": [
+          "Animierte und Video-Hintergründe hinter den Symbolen (auch unter Windows 11 24H2+)",
+          "Widgets: Systemmonitor, Uhr, Wetter, Netzwerk, Datenträger",
+          "DeskStrip-Dock und DeskContainers (Gruppen wie Fences)",
+          "10-Band-Equalizer für das ganze System über Equalizer APO",
+          "Plugins: News Crawler, Appearance und mehr"
         ]
       }
     },
@@ -49,7 +65,9 @@
       ],
       "tagline": {
         "en": "News and markets ticker inside your taskbar",
-        "el": "Ειδήσεις και αγορές σε μπάρα μέσα στη γραμμή εργασιών"
+        "el": "Ειδήσεις και αγορές σε μπάρα μέσα στη γραμμή εργασιών",
+        "fr": "Bandeau d'actualités et de marchés dans la barre des tâches",
+        "de": "Nachrichten- und Börsenticker in der Taskleiste"
       },
       "capabilities": {
         "en": [
@@ -65,6 +83,20 @@
           "Τιμές, χαρτοφυλάκιο και ειδοποιήσεις ορίων· καιρός και προειδοποιήσεις έντονων φαινομένων",
           "Διάφανη μπάρα στον ελεύθερο χώρο της γραμμής εργασιών ή στην επιφάνεια εργασίας",
           "Αυτόνομη εφαρμογή ή plugin του Opsis"
+        ],
+        "fr": [
+          "Titres défilants de nombreuses sources et catégories",
+          "Mode flash info avec son et lien vers un direct vidéo",
+          "Cours, portefeuille et alertes de prix ; météo et alertes météo sévères",
+          "Barre transparente dans l'espace libre de la barre des tâches ou sur le bureau",
+          "Application autonome ou plugin Opsis"
+        ],
+        "de": [
+          "Laufende Schlagzeilen aus vielen Quellen und Kategorien",
+          "Eilmeldungsmodus mit Ton und Link zum Live-Video",
+          "Kurse, Portfolio und Preisalarme; Wetter und Unwetterwarnungen",
+          "Transparente Leiste im freien Teil der Taskleiste oder auf dem Desktop",
+          "Eigenständige App oder Opsis-Plugin"
         ]
       }
     },
@@ -81,7 +113,9 @@
       ],
       "tagline": {
         "en": "Change the look of Windows itself",
-        "el": "Αλλάξτε την εμφάνιση των ίδιων των Windows"
+        "el": "Αλλάξτε την εμφάνιση των ίδιων των Windows",
+        "fr": "Changez l'apparence de Windows lui-même",
+        "de": "Ändere das Aussehen von Windows selbst"
       },
       "capabilities": {
         "en": [
@@ -97,6 +131,20 @@
           "Theme Manager με εισαγωγή/εξαγωγή πλήρων θεμάτων",
           "Slideshow wallpaper και ρυθμίσεις συμπεριφοράς Εξερευνητή/taskbar",
           "Σημείο επαναφοράς και αντίγραφο ασφαλείας πριν από παρεμβατικές αλλαγές"
+        ],
+        "fr": [
+          "Thème clair/sombre automatique au lever/coucher du soleil, accent tiré du fond d'écran",
+          "Barre des tâches translucide et arrondie, Mica/Acrylic pour chaque fenêtre",
+          "Theme Manager avec import/export de thèmes complets",
+          "Diaporama de fonds d'écran et réglages de l'Explorateur/barre des tâches",
+          "Point de restauration et coffre de sauvegarde avant les changements intrusifs"
+        ],
+        "de": [
+          "Automatisches Hell/Dunkel bei Sonnenauf-/untergang, Akzent aus dem Hintergrundbild",
+          "Transparente und abgerundete Taskleiste, Mica/Acrylic für jedes Fenster",
+          "Theme Manager mit Import/Export kompletter Designs",
+          "Hintergrund-Diashow und Einstellungen für Explorer/Taskleiste",
+          "Wiederherstellungspunkt und Backup-Tresor vor tiefgreifenden Änderungen"
         ]
       }
     },
@@ -113,7 +161,9 @@
       ],
       "tagline": {
         "en": "Complete PC care for Windows 11",
-        "el": "Πλήρης φροντίδα του υπολογιστή για Windows 11"
+        "el": "Πλήρης φροντίδα του υπολογιστή για Windows 11",
+        "fr": "Entretien complet du PC pour Windows 11",
+        "de": "Komplette PC-Pflege für Windows 11"
       },
       "capabilities": {
         "en": [
@@ -129,6 +179,20 @@
           "Επισκευή υγείας (SFC/DISM), καθαριστής μητρώου, αντίγραφα και σημεία επαναφοράς",
           "Εργαλεία ασφάλειας και απορρήτου, tweaks των Windows με ασφαλή αναίρεση",
           "Βιβλιοθήκη παιχνιδιών, ρυθμίσεις ανά παιχνίδι· 14 γλώσσες"
+        ],
+        "fr": [
+          "Mises à jour des applis, pilotes et Windows au même endroit",
+          "Nettoyage, démarrage, modes de performance et libération de RAM",
+          "Réparation (SFC/DISM), nettoyeur de registre, sauvegardes et points de restauration",
+          "Outils de sécurité et de confidentialité, réglages Windows avec annulation sûre",
+          "Bibliothèque de jeux, réglages par jeu ; 14 langues"
+        ],
+        "de": [
+          "Updates für Apps, Treiber und Windows an einem Ort",
+          "Bereinigung, Autostart, Leistungsmodi und RAM-Freigabe",
+          "Reparatur (SFC/DISM), Registry-Cleaner, Backups und Wiederherstellungspunkte",
+          "Sicherheits- und Datenschutz-Tools, Windows-Tweaks mit sicherem Rückgängig",
+          "Spielebibliothek, Einstellungen pro Spiel; 14 Sprachen"
         ]
       }
     },
@@ -145,7 +209,9 @@
       ],
       "tagline": {
         "en": "Fast video and audio player on the VLC engine",
-        "el": "Γρήγορος player βίντεο και ήχου με τον κινητήρα του VLC"
+        "el": "Γρήγορος player βίντεο και ήχου με τον κινητήρα του VLC",
+        "fr": "Lecteur vidéo et audio rapide sur le moteur VLC",
+        "de": "Schneller Video- und Audioplayer auf VLC-Basis"
       },
       "capabilities": {
         "en": [
@@ -161,6 +227,20 @@
           "Λήψη υποτίτλων και αυτόματος συγχρονισμός",
           "Equalizer και εφέ ήχου, επιλογή συσκευής εξόδου και καναλιών",
           "Θέματα με κουμπί σκούρου/φωτεινού, μετατροπή σε MP4/MP3"
+        ],
+        "fr": [
+          "Lit presque tous les formats, flux, dossiers DVD et caméras",
+          "Commandes et raccourcis façon Media Player Classic / VLC",
+          "Téléchargement de sous-titres et synchronisation automatique",
+          "Égaliseur et effets audio, choix du périphérique de sortie et des canaux",
+          "Thèmes avec bouton clair/sombre, conversion MP4/MP3"
+        ],
+        "de": [
+          "Spielt fast jedes Format, Streams, DVD-Ordner und Kameras",
+          "Bedienung und Tastenkürzel wie Media Player Classic / VLC",
+          "Untertitel-Download und automatische Synchronisierung",
+          "Equalizer und Audioeffekte, Ausgabegerät- und Kanalwahl",
+          "Designs mit Hell/Dunkel-Schalter, MP4/MP3-Konvertierung"
         ]
       }
     },
@@ -177,7 +257,9 @@
       ],
       "tagline": {
         "en": "A local hub for AI tools, with Claude as the agent",
-        "el": "Τοπικό κέντρο εργαλείων AI, με τον Claude ως πράκτορα"
+        "el": "Τοπικό κέντρο εργαλείων AI, με τον Claude ως πράκτορα",
+        "fr": "Un hub local d'outils d'IA, avec Claude comme agent",
+        "de": "Ein lokaler Hub für KI-Tools, mit Claude als Agent"
       },
       "capabilities": {
         "en": [
@@ -191,6 +273,18 @@
           "Ο Claude ως πράκτορας που συνδέει τα εργαλεία",
           "Plugins (καιρός, γραφείο, ανάπτυξη, δημιουργικά, επιχειρηματικά)",
           "Προβολή συζητήσεων, λογαριασμοί και analytics"
+        ],
+        "fr": [
+          "Un seul endroit pour vos outils d'IA, en local sous Windows",
+          "Claude comme agent qui relie les outils",
+          "Plugins (météo, bureautique, dév., créatif, business)",
+          "Visionneuse de conversations, comptes et analyses"
+        ],
+        "de": [
+          "Ein Ort für deine KI-Tools, lokal unter Windows",
+          "Claude als Agent, der die Tools verbindet",
+          "Plugins (Wetter, Office, Entwicklung, Kreativ, Business)",
+          "Konversationsansicht, Konten und Analysen"
         ]
       },
       "uninstallAliases": [
@@ -210,7 +304,9 @@
       ],
       "tagline": {
         "en": "Real-time audio enhancer and player",
-        "el": "Βελτιωτής και player ήχου σε πραγματικό χρόνο"
+        "el": "Βελτιωτής και player ήχου σε πραγματικό χρόνο",
+        "fr": "Amplificateur et lecteur audio en temps réel",
+        "de": "Echtzeit-Audioverbesserer und -Player"
       },
       "capabilities": {
         "en": [
@@ -224,6 +320,18 @@
           "Μέτρηση έντασης (LUFS) και κανονικοποίηση",
           "Χρονόμετρο ύπνου· εξαγωγή ρυθμίσεων equalizer σε Equalizer APO",
           "Ελαφρύ: Electron με ενσωματωμένο αυτοέλεγχο"
+        ],
+        "fr": [
+          "Égaliseur et effets Web Audio en temps réel",
+          "Mesure de l'intensité (LUFS) et normalisation",
+          "Minuterie de sommeil ; export des réglages d'égaliseur vers Equalizer APO",
+          "Léger : Electron avec auto-test intégré"
+        ],
+        "de": [
+          "Web-Audio-Equalizer und Effekte in Echtzeit",
+          "Lautheitsmessung (LUFS) und Normalisierung",
+          "Schlaftimer; Export der Equalizer-Einstellungen nach Equalizer APO",
+          "Ressourcenschonend: Electron mit integriertem Selbsttest"
         ]
       },
       "uninstallAliases": [

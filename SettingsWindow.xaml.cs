@@ -157,7 +157,7 @@ namespace Kombos
             HelpBodyText.Text = L.HelpText;
             ReplayOnboardingButton.Content = L.ReplayOnboardingButton;
             OpenSuiteButton.Content = SuiteStrings.SuiteButton;
-            NotifyNewVersionsCheckBox.Content = SuiteStrings.NotifyNewVersions;
+            NotifyNewVersionsCheckBox.Content = new System.Windows.Controls.TextBlock { Text = SuiteStrings.NotifyNewVersions, TextWrapping = System.Windows.TextWrapping.Wrap };
             NotifyNewVersionsCheckBox.Checked -= NotifyNewVersionsCheckBox_Changed;
             NotifyNewVersionsCheckBox.Unchecked -= NotifyNewVersionsCheckBox_Changed;
             NotifyNewVersionsCheckBox.IsChecked = _owner._notifyNewVersions;

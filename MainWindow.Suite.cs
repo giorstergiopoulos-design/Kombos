@@ -357,8 +357,10 @@ namespace Kombos
         private void StartUpdateWatcher()
         {
             var repo = string.IsNullOrWhiteSpace(_updateCheckRepo) ? SuiteCatalog.Owner + "/Kombos" : _updateCheckRepo.Trim();
-            _updateNotifier = new UpdateNotifier(SuiteHttp, new UpdateNoticeStore(), repo, L.AppVersion);
-            _updateTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(30) };
+            // Δοκιμαστικοί διακόπτες (μόνο μεταβλητές περιβάλλοντος, ποτέ UI): ψεύτικη "τρέχουσα" έκδοση και σύντομος πρώτος έλεγχος.
+            var testCurrent = Environment.GetEnvironmentVariable("KOMBOS_TEST_CURRENT_VERSION");
+            _updateNotifier = new UpdateNotifier(SuiteHttp, new UpdateNoticeStore(), repo, string.IsNullOrWhiteSpace(testCurrent) ? L.AppVersion : testCurrent);
+            _updateTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(string.IsNullOrWhiteSpace(testCurrent) ? 30 : 3) };
             _updateTimer.Tick += async (s, e) =>
             {
                 _updateTimer!.Interval = TimeSpan.FromHours(24);
@@ -375,6 +377,24 @@ namespace Kombos
                     _trayIcon?.ShowNotification("Κόμβος", SuiteStrings.BalloonText(info.Version), () => Dispatcher.Invoke(() => OpenExternalUrl(info.HtmlUrl)));
             };
             _updateTimer.Start();
+        }
+
+        /// <summary>Δοκιμαστικός διακόπτης KOMBOS_TEST_OPEN=settings|suite|guide: ανοίγει το αντίστοιχο παράθυρο στην εκκίνηση
+        /// (για αυτοματοποιημένα screenshots). Χωρίς τη μεταβλητή δεν κάνει τίποτα.</summary>
+        private void RunTestOpenHook()
+        {
+            var what = Environment.GetEnvironmentVariable("KOMBOS_TEST_OPEN");
+            if (string.IsNullOrWhiteSpace(what)) return;
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                switch (what.Trim().ToLowerInvariant())
+                {
+                    case "settings": OpenSettingsWindow("behavior"); break;
+                    case "settings-about": OpenSettingsWindow("about"); break;
+                    case "suite": ShowSuite(); break;
+                    case "guide": ShowOnboarding(isReplay: true); break;
+                }
+            }), DispatcherPriority.ApplicationIdle);
         }
 
         private void UpdateToastOpen_Click(object sender, RoutedEventArgs e)

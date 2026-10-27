@@ -4,6 +4,12 @@ All notable changes to Kombos, summarized here for GitHub. The full changelog - 
 languages (Greek, English, French, German) - is always available inside the app itself, via the Help panel's
 "Version history" tab.
 
+## v4.9.1 — Opsis family: French/German descriptions, wrapped setting label
+
+- The Opsis family showcase now has French and German descriptions for every app (previously they fell back to English).
+- The "Notify about new versions" setting label wraps instead of clipping in longer languages.
+- Test-only environment switches `KOMBOS_TEST_OPEN` and `KOMBOS_TEST_CURRENT_VERSION` (no effect unless set) used for automated screenshots; verified the update toast, the showcase and the Settings window in the real app.
+
 ## v4.9.0 — Welcome guide, Opsis family, update notice
 
 - Welcome guide shown on each new major/minor version (remembered per version, "Don't show again", Esc/arrow keys). It closes by shrinking into the app's animated icon, like the startup curtain.

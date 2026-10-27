@@ -609,6 +609,7 @@ namespace Kombos
         {
             RegisterGlobalHotkey();
             StartUpdateWatcher();
+            RunTestOpenHook();
 
             // Ο οδηγός πρώτης χρήσης έχει προτεραιότητα έναντι του "εκκίνηση ελαχιστοποιημένο" - αλλιώς ένας
             // χρήστης που δεν έχει δει ποτέ τον οδηγό θα έμενε για πάντα χωρίς αυτόν (το Window_Loaded τρέχει

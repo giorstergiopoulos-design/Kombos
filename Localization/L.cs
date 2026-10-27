@@ -10,7 +10,7 @@ namespace Kombos.Localization
     public static class L
     {
         public static Lang Current { get; set; } = Lang.EL;
-        public const string AppVersion = "4.9.0";
+        public const string AppVersion = "4.9.1";
 
         public static Lang Next => Current switch
         {
