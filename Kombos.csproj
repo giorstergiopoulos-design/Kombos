@@ -40,6 +40,7 @@
          Windows, καμία κλήση cloud/API key. Στο .NET 10 (windows-desktop) είναι πλέον ξεχωριστό πακέτο, όχι
          built-in όπως στο .NET Framework. -->
     <EmbeddedResource Include="Data/suite-apps.json" />
+    <EmbeddedResource Include="Resources\suite\*.ico" />
     <PackageReference Include="System.Speech" Version="10.0.0" />
   </ItemGroup>
 

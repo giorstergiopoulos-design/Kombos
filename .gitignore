@@ -11,3 +11,6 @@ installer/output/
 ## User-specific
 *.user
 .vs/
+
+## Release staging (installer + checksums + notes)
+release/

@@ -29,7 +29,7 @@
                     CornerRadius="8,8,0,0" MouseLeftButtonDown="AccountsHeader_MouseLeftButtonDown">
                 <Grid Height="36" Margin="14,0,4,0">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left">
-                        <TextBlock Text="&#x1F510;" FontSize="14" Margin="0,0,7,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="&#x1F510;" Foreground="White" FontSize="14" Margin="0,0,7,0" VerticalAlignment="Center"/>
                         <TextBlock x:Name="AccountsTitleText" Foreground="White" FontSize="13" FontWeight="Bold"
                                    FontFamily="Bahnschrift" VerticalAlignment="Center"/>
                     </StackPanel>

@@ -45,7 +45,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="{Binding Label}" FontSize="12.5"
                                        Foreground="{DynamicResource InkBrush}"/>
-                            <TextBlock Grid.Column="1" Text="{Binding Category}" FontSize="10"
+                            <TextBlock Grid.Column="1" Text="{Binding Category}" FontSize="10" Margin="14,0,0,0" VerticalAlignment="Center"
                                        Foreground="{DynamicResource InkSoftBrush}"/>
                         </Grid>
                     </DataTemplate>

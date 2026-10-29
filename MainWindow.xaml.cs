@@ -678,6 +678,7 @@ namespace Kombos
             OnboardingDontShowCheck.IsChecked = _guideDontShow;
             RenderOnboardingPage();
             OnboardingOverlay.Visibility = Visibility.Visible;
+            OnboardingNextButton.Focus();
             // ΔΙΟΡΘΩΣΗ: το AppShellBorder.Opacity (ρύθμιση "Διαφάνεια") καλύπτει ΟΛΟ το παράθυρο, άρα και
             // αυτό το overlay - με Ελαφριά/Μέτρια διαφάνεια ενεργή, ο οδηγός έβγαινε ημιδιάφανος πάνω σε ό,τι
             // βρίσκεται πίσω από το παράθυρο στην οθόνη (αναφέρθηκε ως "σκοτεινό και θολό" σε dark mode). Ο
@@ -1242,6 +1243,7 @@ namespace Kombos
             ArtifactsLabelText.Text = L.SidebarArtifactsLabel;
             ProjectsSidebarLabelText.Text = L.SidebarProjectsLabel;
             SettingsGearLabelText.Text = L.SidebarSettingsLabel;
+            RefreshSuiteTexts();
             DetailsOpenBtn.Content = L.OpenFreeVersion;
             DetailsMcpBtn.Content = L.AddToClaudeDesktop;
             DetailsPricingBtn.Content = L.UpgradePlan;
@@ -1260,6 +1262,7 @@ namespace Kombos
             _trayIcon?.SetExtraTexts(SuiteStrings.WelcomeGuide, SuiteStrings.SuiteTitle);
             ScrollToBottomButton.ToolTip = L.ScrollToBottomTooltip;
             ToolSearchBox.ToolTip = L.ToolSearchPlaceholder;
+            ToolSearchHint.Text = L.ToolSearchPlaceholder;
             OnboardingSkipButton.Content = L.OnboardingSkip;
             if (OnboardingOverlay.Visibility == Visibility.Visible) RenderOnboardingPage();
 
@@ -2083,6 +2086,7 @@ namespace Kombos
         /// επανεκκινείται σε κάθε πλήκτρο μαζεύει τα ενδιάμεσα πατήματα σε ΕΝΑ rebuild μετά το τελευταίο.</summary>
         private void ToolSearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
+            ToolSearchHint.Visibility = ToolSearchBox.Text.Length == 0 ? Visibility.Visible : Visibility.Collapsed;
             _searchDebounceTimer ??= new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(220) };
             _searchDebounceTimer.Stop();
             _searchDebounceTimer.Tick -= SearchDebounceTimer_Tick;

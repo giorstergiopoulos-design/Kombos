@@ -100,6 +100,10 @@ namespace Kombos.Services
 
     public static class ReleaseDownloader
     {
+        /// <summary>Client για τις λήψεις installer: ΧΩΡΙΣ συνολικό timeout (οι installers φτάνουν τα 100 MB· το 30s του
+        /// κοινού client τούς έκοβε στη μέση) - η ακύρωση γίνεται μέσω CancellationToken.</summary>
+        public static HttpClient CreateDownloadClient() => new() { Timeout = Timeout.InfiniteTimeSpan };
+
         public static LatestRelease? ParseRelease(string json)
         {
             try

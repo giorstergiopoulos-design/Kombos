@@ -4,6 +4,29 @@ All notable changes to Kombos, summarized here for GitHub. The full changelog - 
 languages (Greek, English, French, German) - is always available inside the app itself, via the Help panel's
 "Version history" tab.
 
+## v4.9.2 — Real icons in the Opsis family, bug audit, installer branding, repo presentation
+
+**Added**
+- The Opsis family window now shows the REAL icon of all 7 apps (embedded multi-size `.ico` resources, picked per DPI; a letter tile only as a fallback for an unknown future app). Test: every catalogue app resolves to an embedded icon, and a 200 % DPI request picks a larger frame.
+- Installer: Kombos icon on the setup window and on the wizard pages (large/small images at 100/150/200 % DPI).
+- Release now ships a `.sha256` file; the README explains how to verify it. README has the app icon, new screenshots of the real UI (dark and light) in `docs/img`, and a 1280x640 social-preview image.
+- Localisation-coverage test: every guide/showcase/update string exists in all four languages (no empty strings, no untranslated copies, placeholders preserved), and every catalogue app has el/en/fr/de text.
+
+**Bug audit (real app run, dark + light, 8 windows + installer) — found / fixed**
+1. Showcase downloads used a client with a 30 s total timeout, which would cut every large installer (GearWin 74 MB, Media Player Pro 100 MB) — fixed with a no-timeout download client (test added).
+2. Double-clicking Download started the same download twice — guarded.
+3. Download progress re-rendered all cards on every chunk — throttled to whole-percent changes.
+4. Command palette: item name and the "Tool" label were glued together ("ChatGPTΕργαλείο") — spacing fixed.
+5. Accounts and Analytics window title icons were invisible in dark theme (default dark foreground on dark header) — fixed.
+6. The tool search box had no visible hint — placeholder added (tooltip/automation name existed only as a tooltip).
+7. Welcome guide and showcase let Tab move focus to controls behind the overlay — focus now cycles inside the overlay; the guide focuses its Next button.
+8. Language change while the showcase/guide/toast was open left old-language text — refreshed.
+9. Showcase buttons had no accessible names ("Download" for which app?) — names include the app.
+
+**Still open / not verified**: 150 %/200 % display scaling was not run on a real scaled display (icon frame selection is unit-tested; layout is DPI-independent WPF); RTL not applicable (no RTL language); the tray balloon was not observed live (toast was); real installer download from the showcase is covered by unit tests only.
+
+**Repo hygiene**: removed the outdated `screenshots/` folder (replaced by `docs/img/`); `release/` is git-ignored. Kept: `PluginsBundled/*.dll` (shipped with the app), `plugins-src/_ref/Kombos.dll` (reference for building plugins), HANDOFF.md, CLAUDE.md.
+
 ## v4.9.1 — Opsis family: French/German descriptions, wrapped setting label
 
 - The Opsis family showcase now has French and German descriptions for every app (previously they fell back to English).

@@ -391,10 +391,12 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <WrapPanel x:Name="CategoryTabsPanel" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"/>
-                    <TextBox x:Name="ToolSearchBox" Grid.Column="1" Width="170" Margin="10,0,0,0" Padding="8,5"
+                    <TextBlock x:Name="ToolSearchHint" Grid.Column="1" Margin="19,6,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"
+                               IsHitTestVisible="False" FontSize="12" Foreground="{DynamicResource InkSoftBrush}" Panel.ZIndex="1"/>
+                    <TextBox x:Name="ToolSearchBox" Grid.Column="1" AutomationProperties.Name="Search tools" VerticalAlignment="Top" Width="170" Margin="10,0,0,0" Padding="8,5"
                              Background="{DynamicResource PaperBrush}" Foreground="{DynamicResource InkBrush}"
                              BorderBrush="{DynamicResource LineBrush}" BorderThickness="1"
-                             VerticalAlignment="Center" TextChanged="ToolSearchBox_TextChanged"/>
+                             TextChanged="ToolSearchBox_TextChanged"/>
                 </Grid>
 
                 <!-- Category tiles - πλευρικά βελάκια σελιδοποίησης αντί για scrollbar. Το ScrollViewer
@@ -659,7 +661,7 @@
 
             <!-- Οδηγός πρώτης εκκίνησης (onboarding) - πάνω από ΟΛΑ, ακόμα και το splash. Ξαναδιαθέσιμος
                  μόνιμα από Ρυθμίσεις → Πληροφορίες → Βοήθεια ("Προβολή οδηγού ξανά"). -->
-            <Grid x:Name="OnboardingOverlay" Grid.RowSpan="3" Grid.ColumnSpan="2" Panel.ZIndex="2000"
+            <Grid x:Name="OnboardingOverlay" KeyboardNavigation.TabNavigation="Cycle" KeyboardNavigation.ControlTabNavigation="Cycle" Grid.RowSpan="3" Grid.ColumnSpan="2" Panel.ZIndex="2000"
                   Background="{DynamicResource PaperBrush}" Visibility="Collapsed">
                 <Button x:Name="OnboardingSkipButton" Content="" FontSize="11.5" HorizontalAlignment="Right" VerticalAlignment="Top"
                         Margin="0,18,26,0" Padding="8,4" Background="Transparent" BorderThickness="0" Cursor="Hand"
@@ -702,7 +704,7 @@
 
             <!-- Βιτρίνα "Η οικογένεια Opsis" - κάρτα ανά εφαρμογή (κατάσταση εγκατάστασης, Άνοιγμα/Λήψη/Λεπτομέρειες).
                  Κλείνει όπως ο οδηγός: μικραίνει μέσα στο κινούμενο εικονίδιο της εφαρμογής. Αφήνει ελεύθερη τη γραμμή τίτλου. -->
-            <Grid x:Name="SuiteOverlay" Grid.Row="1" Grid.RowSpan="2" Grid.ColumnSpan="2" Panel.ZIndex="1900"
+            <Grid x:Name="SuiteOverlay" KeyboardNavigation.TabNavigation="Cycle" KeyboardNavigation.ControlTabNavigation="Cycle" Grid.Row="1" Grid.RowSpan="2" Grid.ColumnSpan="2" Panel.ZIndex="1900"
                   Background="{DynamicResource PaperBrush}" Visibility="Collapsed">
                 <Grid x:Name="SuiteContent" RenderTransformOrigin="0.5,0.5">
                     <Grid.RowDefinitions>

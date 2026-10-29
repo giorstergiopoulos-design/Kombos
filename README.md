@@ -1,4 +1,8 @@
-# Κόμβος (Kombos)
+<p align="center"><img src="docs/img/icon.png" alt="Kombos" width="120"/></p>
+
+<h1 align="center">Κόμβος (Kombos)</h1>
+
+<p align="center"><b>v4.9.2</b> · WPF · .NET 10 · EL / EN / FR / DE · <a href="../../releases/latest">Λήψη / Download</a> · <a href="#η-οικογένεια-opsis--the-opsis-family">Η οικογένεια Opsis</a></p>
 
 Ένας τοπικός κόμβος (hub) για εργαλεία τεχνητής νοημοσύνης στα Windows — στο κέντρο του βρίσκεται μια
 συνομιλία με τον Claude (ή όποιον άλλο agent προτιμήσεις), που ξέρει τον κατάλογο 39+ εργαλείων AI και
@@ -48,16 +52,26 @@ tray icon με λειτουργία στο παρασκήνιο, και αυτό
 
 <table>
 <tr>
-<td><img src="screenshots/02-main-light.png" width="400"/><br/><sub>Κύρια οθόνη, φωτεινό θέμα / Main window, light</sub></td>
-<td><img src="screenshots/03-main-dark.png" width="400"/><br/><sub>Κύρια οθόνη, σκούρο θέμα / Main window, dark</sub></td>
+<td><img src="docs/img/main-dark.png" width="400"/><br/><sub>Κύρια οθόνη, σκούρο θέμα / Main window, dark</sub></td>
+<td><img src="docs/img/main-light.png" width="400"/><br/><sub>Κύρια οθόνη, φωτεινό θέμα / Main window, light</sub></td>
 </tr>
 <tr>
-<td><img src="screenshots/01-welcome.png" width="400"/><br/><sub>Οδηγός πρώτης εκκίνησης / First-run guide</sub></td>
-<td><img src="screenshots/04-settings-gateway.png" width="200"/> <img src="screenshots/05-appearance.png" width="190"/><br/><sub>Ρυθμίσεις (Gateway, αυτόματη συνέχιση) και Εμφάνιση / Settings and Appearance</sub></td>
+<td><img src="docs/img/family-dark.png" width="400"/><br/><sub>Η οικογένεια Opsis (πραγματικά εικονίδια, κατάσταση εγκατάστασης) / The Opsis family</sub></td>
+<td><img src="docs/img/family-light.png" width="400"/><br/><sub>Η οικογένεια Opsis, φωτεινό / The Opsis family, light</sub></td>
+</tr>
+<tr>
+<td><img src="docs/img/guide-dark.png" width="400"/><br/><sub>Οδηγός καλωσορίσματος / Welcome guide</sub></td>
+<td><img src="docs/img/settings-dark.png" width="300"/><br/><sub>Ρυθμίσεις / Settings</sub></td>
 </tr>
 </table>
 
 ### Εγκατάσταση
+
+1. Κατέβασε το `KombosSetup-<έκδοση>.exe` και το αντίστοιχο `.sha256` από τα [Releases](../../releases/latest).
+2. Επαλήθευσε το αρχείο (PowerShell): `(Get-FileHash .\KombosSetup-<έκδοση>.exe -Algorithm SHA256).Hash` — πρέπει να ταιριάζει με το περιεχόμενο του `.sha256`.
+3. Εκτέλεσέ το (χωρίς δικαιώματα διαχειριστή). Απαιτήσεις: Windows 10/11 x64, [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0).
+
+Άλλες εφαρμογές της ίδιας σειράς: **Η οικογένεια Opsis** (Ρυθμίσεις → Βοήθεια).
 
 Κατεβάστε το τελευταίο `KombosSetup-*.exe` από τα [Releases](../../releases) και εκτελέστε το. Δεν απαιτεί
 δικαιώματα διαχειριστή· προσφέρει προαιρετική συντόμευση επιφάνειας εργασίας και εκκίνηση με τα Windows.
@@ -139,9 +153,24 @@ No telemetry. Only: (1) `GET api.github.com/repos/giorstergiopoulos-design/Kombo
 
 ### Screenshots
 
-See the [screenshot gallery](#στιγμιότυπα-οθόνης--screenshots) above.
+<table>
+<tr>
+<td><img src="docs/img/main-dark.png" width="400"/><br/><sub>Main window, dark</sub></td>
+<td><img src="docs/img/family-dark.png" width="400"/><br/><sub>The Opsis family (real icons, install state)</sub></td>
+</tr>
+<tr>
+<td><img src="docs/img/guide-dark.png" width="400"/><br/><sub>Welcome guide</sub></td>
+<td><img src="docs/img/main-light.png" width="400"/><br/><sub>Main window, light</sub></td>
+</tr>
+</table>
 
 ### Installation
+
+1. Download `KombosSetup-<version>.exe` and its `.sha256` from the [latest release](../../releases/latest).
+2. Verify it (PowerShell): `(Get-FileHash .\KombosSetup-<version>.exe -Algorithm SHA256).Hash` — it must match the `.sha256` file.
+3. Run it (no admin rights needed). Requirements: Windows 10/11 x64, the [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0).
+
+More apps from the same family: **The Opsis family** (Settings → Help).
 
 Download the latest `KombosSetup-*.exe` from [Releases](../../releases) and run it. It needs no
 administrator rights and offers an optional desktop shortcut and start-with-Windows. Requires the
@@ -184,3 +213,7 @@ application. Kombos Gateway is inspired by the idea behind the open-source
 [OmniRoute](https://github.com/diegosouzapw/OmniRoute) (MIT); no code was copied.*
 
 **Το λογισμικό παρέχεται "ΩΣ ΕΧΕΙ", χωρίς καμία εγγύηση. / Provided "AS IS", without warranty of any kind.**
+
+### Third-party notices / Άδειες τρίτων
+
+Kombos uses .NET (MIT) and the `System.Speech` package (MIT). The icons shown in "The Opsis family" are the icons of the respective apps of the same author, embedded as local resources. Product names and logos in the tools catalogue belong to their owners. / Το Kombos χρησιμοποιεί .NET (MIT) και το πακέτο `System.Speech` (MIT)· τα εικονίδια της οικογένειας Opsis είναι των αντίστοιχων εφαρμογών του ίδιου δημιουργού, ενσωματωμένα τοπικά· τα ονόματα/λογότυπα του καταλόγου ανήκουν στους ιδιοκτήτες τους.

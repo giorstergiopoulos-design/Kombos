@@ -22,6 +22,8 @@ namespace Kombos
     public partial class MainWindow
     {
         private static readonly HttpClient SuiteHttp = new() { Timeout = TimeSpan.FromSeconds(30) };
+        private static readonly HttpClient SuiteDownloadHttp = ReleaseDownloader.CreateDownloadClient();
+        private readonly HashSet<string> _suiteDownloading = new();
 
         private string _guideSeenVersion = "";
         private bool _guideDontShow;
@@ -137,6 +139,20 @@ namespace Kombos
         }
 
         private void SuiteClose_Click(object sender, RoutedEventArgs e) => HideSuite();
+
+        /// <summary>Ανανέωση κειμένων των overlays όταν αλλάζει η γλώσσα ενώ είναι ανοιχτά.</summary>
+        private void RefreshSuiteTexts()
+        {
+            SuiteTitleText.Text = SuiteStrings.SuiteTitle;
+            SuiteSubtitleText.Text = SuiteStrings.SuiteSubtitle;
+            SuiteFooterText.Text = SuiteStrings.SuiteFooter;
+            SuiteCloseButton.Content = SuiteStrings.SuiteClose;
+            OnboardingDontShowCheck.Content = SuiteStrings.GuideDontShow;
+            UpdateToastOpenButton.Content = SuiteStrings.WhatsNew;
+            UpdateToastLaterButton.Content = SuiteStrings.Later;
+            if (_pendingUpdate != null) UpdateToastText.Text = SuiteStrings.UpdateToast(_pendingUpdate.Version);
+            if (SuiteOverlay.Visibility == Visibility.Visible) RenderSuiteCards(null);
+        }
         private void ClassicGuideMenuItem_Click(object sender, RoutedEventArgs e) => ShowOnboarding(isReplay: true);
         private void ClassicSuiteMenuItem_Click(object sender, RoutedEventArgs e) => ShowSuite();
 
@@ -196,7 +212,7 @@ namespace Kombos
             var head = new Grid();
             head.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             head.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            head.Children.Add(BuildSuiteIcon(app.Name, color));
+            head.Children.Add(BuildSuiteIcon(app, color, VisualTreeHelper.GetDpi(this).DpiScaleX));
             var titles = new StackPanel { Margin = new Thickness(14, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center };
             Grid.SetColumn(titles, 1);
             var name = new TextBlock { Text = app.Name, FontSize = 17, FontWeight = FontWeights.Bold, FontFamily = new FontFamily("Bahnschrift"), TextWrapping = TextWrapping.Wrap };
@@ -238,18 +254,18 @@ namespace Kombos
 
             var buttons = new WrapPanel { Margin = new Thickness(0, 10, 0, 0) };
             if (info?.ExePath != null && !isSelf)
-                buttons.Children.Add(SuiteButton(SuiteStrings.Open, true, () => OpenSuiteApp(info.ExePath)));
+                buttons.Children.Add(SuiteButton(SuiteStrings.Open, true, () => OpenSuiteApp(info.ExePath), SuiteStrings.Open + " " + app.Name));
             if (info != null && (info.State == InstallState.NotInstalled && !isSelf || info.State == InstallState.UpdateAvailable))
                 buttons.Children.Add(SuiteButton(info.State == InstallState.UpdateAvailable ? SuiteStrings.Update : SuiteStrings.Install, info.ExePath == null,
-                    () => _ = InstallSuiteAppAsync(app)));
-            buttons.Children.Add(SuiteButton(SuiteStrings.Details, false, () => OpenExternalUrl(app.RepoUrl)));
+                    () => _ = InstallSuiteAppAsync(app), (info.State == InstallState.UpdateAvailable ? SuiteStrings.Update : SuiteStrings.Install) + " " + app.Name));
+            buttons.Children.Add(SuiteButton(SuiteStrings.Details, false, () => OpenExternalUrl(app.RepoUrl), SuiteStrings.Details + " " + app.Name));
             stack.Children.Add(buttons);
 
             card.Child = stack;
             return card;
         }
 
-        private static Button SuiteButton(string text, bool primary, Action click)
+        private static Button SuiteButton(string text, bool primary, Action click, string? accessibleName = null)
         {
             var b = new Button { Content = text, Padding = new Thickness(14, 6, 14, 6), Margin = new Thickness(0, 0, 8, 6), FontSize = 12, Cursor = System.Windows.Input.Cursors.Hand };
             if (primary) { b.SetResourceReference(Control.BackgroundProperty, "ClaudeBrush"); b.Foreground = Brushes.White; b.BorderThickness = new Thickness(0); }
@@ -258,31 +274,49 @@ namespace Kombos
                 b.Background = Brushes.Transparent; b.BorderThickness = new Thickness(1);
                 b.SetResourceReference(Control.BorderBrushProperty, "LineBrush"); b.SetResourceReference(Control.ForegroundProperty, "InkBrush");
             }
+            if (accessibleName != null) System.Windows.Automation.AutomationProperties.SetName(b, accessibleName);
             b.Click += (s, e) => click();
             return b;
         }
 
-        /// <summary>Κινούμενο εικονίδιο κάρτας: κύκλος με το αρχικό γράμμα που "ανασαίνει" + δακτύλιος που περιστρέφεται
-        /// (απλό στατικό εικονίδιο σε χαμηλής ισχύος PC / όταν οι animations είναι κλειστές).</summary>
-        private static FrameworkElement BuildSuiteIcon(string appName, Color color)
+        /// <summary>Κινούμενο εικονίδιο κάρτας: το ΠΡΑΓΜΑΤΙΚΟ εικονίδιο της εφαρμογής (ενσωματωμένο .ico, καθαρό σε κάθε DPI)
+        /// που "ανασαίνει" μέσα σε δακτύλιο που περιστρέφεται. Μόνο για άγνωστη εφαρμογή: κύκλος με το αρχικό γράμμα.
+        /// Απλό στατικό εικονίδιο σε χαμηλής ισχύος PC / όταν οι animations είναι κλειστές.</summary>
+        private static FrameworkElement BuildSuiteIcon(SuiteApp app, Color color, double dpiScale)
         {
             var host = new Grid { Width = 52, Height = 52, VerticalAlignment = VerticalAlignment.Top };
             var ring = new Ellipse { Width = 52, Height = 52, StrokeThickness = 2, Stroke = new SolidColorBrush(color), StrokeDashArray = new DoubleCollection { 3, 3 }, Opacity = 0.55, RenderTransformOrigin = new Point(0.5, 0.5) };
             var rot = new RotateTransform(0);
             ring.RenderTransform = rot;
-            var disc = new Ellipse { Width = 40, Height = 40, Fill = new SolidColorBrush(color), RenderTransformOrigin = new Point(0.5, 0.5) };
-            var pulse = new ScaleTransform(1, 1);
-            disc.RenderTransform = pulse;
-            var letter = new TextBlock
+            host.Children.Add(ring);
+
+            FrameworkElement face;
+            var bmp = SuiteIcons.Load(app.Id, (int)Math.Ceiling(40 * dpiScale));
+            if (bmp != null)
             {
-                Text = new string(appName.Replace("Opsis ", "").Take(1).ToArray()).ToUpperInvariant(), Foreground = Brushes.White, FontSize = 20,
-                FontWeight = FontWeights.Bold, FontFamily = new FontFamily("Bahnschrift"), HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center
-            };
-            host.Children.Add(ring); host.Children.Add(disc); host.Children.Add(letter);
+                var img = new Image { Source = bmp, Width = 40, Height = 40, Stretch = Stretch.Uniform, SnapsToDevicePixels = true, UseLayoutRounding = true };
+                RenderOptions.SetBitmapScalingMode(img, BitmapScalingMode.HighQuality);
+                face = img;
+            }
+            else
+            {
+                var tile = new Grid { Width = 40, Height = 40 };
+                tile.Children.Add(new Ellipse { Fill = new SolidColorBrush(color) });
+                tile.Children.Add(new TextBlock
+                {
+                    Text = new string(app.Name.Replace("Opsis ", "").Take(1).ToArray()).ToUpperInvariant(), Foreground = Brushes.White, FontSize = 20,
+                    FontWeight = FontWeights.Bold, FontFamily = new FontFamily("Bahnschrift"), HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center
+                });
+                face = tile;
+            }
+            face.RenderTransformOrigin = new Point(0.5, 0.5);
+            var pulse = new ScaleTransform(1, 1);
+            face.RenderTransform = pulse;
+            host.Children.Add(face);
             if (!SimpleAnimations)
             {
                 rot.BeginAnimation(RotateTransform.AngleProperty, new DoubleAnimation(0, 360, TimeSpan.FromSeconds(9)) { RepeatBehavior = RepeatBehavior.Forever });
-                var p = new DoubleAnimation(0.94, 1.06, TimeSpan.FromSeconds(1.6)) { AutoReverse = true, RepeatBehavior = RepeatBehavior.Forever, EasingFunction = new SineEase() };
+                var p = new DoubleAnimation(0.96, 1.04, TimeSpan.FromSeconds(1.6)) { AutoReverse = true, RepeatBehavior = RepeatBehavior.Forever, EasingFunction = new SineEase() };
                 pulse.BeginAnimation(ScaleTransform.ScaleXProperty, p);
                 pulse.BeginAnimation(ScaleTransform.ScaleYProperty, p);
             }
@@ -307,6 +341,7 @@ namespace Kombos
         private async Task InstallSuiteAppAsync(SuiteApp app)
         {
             var releasePage = $"{app.RepoUrl}/releases/latest";
+            if (!_suiteDownloading.Add(app.Id)) return; // διπλό κλικ: ήδη σε εξέλιξη
             try
             {
                 var rel = _suiteLatest.GetValueOrDefault(app.Id) ?? await ReleaseDownloader.GetLatestAsync(SuiteHttp, app.Repo);
@@ -327,9 +362,19 @@ namespace Kombos
                     return;
 
                 var downloads = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
-                var progress = new Progress<double>(p => { _suiteStatus[app.Id] = SuiteStrings.Downloading((int)(p * 100)); RenderSuiteCards(null); });
+                int lastPct = -1;
+                var progress = new Progress<double>(p =>
+                {
+                    int pct = (int)(p * 100);
+                    if (pct == lastPct) return; // μην ξαναζωγραφίζεις τις κάρτες σε κάθε κομμάτι δεδομένων
+                    lastPct = pct;
+                    _suiteStatus[app.Id] = SuiteStrings.Downloading(pct);
+                    if (SuiteOverlay.Visibility == Visibility.Visible) RenderSuiteCards(null);
+                });
                 string path;
-                try { path = await ReleaseDownloader.DownloadVerifiedAsync(SuiteHttp, asset, hash, downloads, progress); }
+                _suiteStatus[app.Id] = SuiteStrings.Downloading(0);
+                RenderSuiteCards(null);
+                try { path = await ReleaseDownloader.DownloadVerifiedAsync(SuiteDownloadHttp, asset, hash, downloads, progress); }
                 catch (ChecksumMismatchException)
                 {
                     _suiteStatus.Remove(app.Id);
@@ -345,7 +390,7 @@ namespace Kombos
                 _suiteStatus.Remove(app.Id);
                 MessageBox.Show(this, SuiteStrings.DownloadFailed(ex.Message), app.Name, MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-            finally { _ = RefreshSuiteAsync(); }
+            finally { _suiteDownloading.Remove(app.Id); _ = RefreshSuiteAsync(); }
         }
 
         // ---------- Ειδοποίηση νέας έκδοσης ----------
@@ -393,6 +438,11 @@ namespace Kombos
                     case "settings-about": OpenSettingsWindow("about"); break;
                     case "suite": ShowSuite(); break;
                     case "guide": ShowOnboarding(isReplay: true); break;
+                    case "appearance": AppearanceButton_Click(this, new RoutedEventArgs()); break;
+                    case "accounts": OpenAccountsWindow(); break;
+                    case "agent": OpenAgentSettingsWindow(); break;
+                    case "analytics": OpenAnalyticsWindow(); break;
+                    case "palette": OpenCommandPalette(); break;
                 }
             }), DispatcherPriority.ApplicationIdle);
         }
