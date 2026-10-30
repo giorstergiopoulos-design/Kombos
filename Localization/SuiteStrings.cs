@@ -36,6 +36,8 @@ namespace Kombos.Localization
         public static string Open => T("Άνοιγμα", "Open", "Ouvrir", "Öffnen");
         public static string Install => T("Λήψη", "Download", "Télécharger", "Herunterladen");
         public static string Update => T("Ενημέρωση", "Update", "Mettre à jour", "Aktualisieren");
+        public static string Cancel => T("Ακύρωση", "Cancel", "Annuler", "Abbrechen");
+        public static string AppNotFound(string path) => T($"Δεν βρέθηκε το εκτελέσιμο: {path}", $"Executable not found: {path}", $"Exécutable introuvable : {path}", $"Programmdatei nicht gefunden: {path}");
         public static string Details => T("Λεπτομέρειες", "Details", "Détails", "Details");
         public static string Checking => T("Έλεγχος…", "Checking…", "Vérification…", "Prüfe…");
         public static string Downloading(int pct) => T($"Λήψη… {pct}%", $"Downloading… {pct}%", $"Téléchargement… {pct}%", $"Lade herunter… {pct}%");

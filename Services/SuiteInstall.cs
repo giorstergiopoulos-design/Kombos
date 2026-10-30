@@ -175,10 +175,12 @@ namespace Kombos.Services
         public static bool Sha256Matches(string file, string expectedHex) =>
             string.Equals(Sha256Of(file), expectedHex, StringComparison.OrdinalIgnoreCase);
 
-        /// <summary>Κατεβάζει στον φάκελο προορισμού ως .part, επαληθεύει SHA-256 και μετονομάζει· σε
-        /// ασυμφωνία διαγράφει το αρχείο και ρίχνει <see cref="ChecksumMismatchException"/>. ΠΟΤΕ δεν εκτελεί τον installer.</summary>
+        /// <summary>Κατεβάζει στον φάκελο προορισμού ως .part, επαληθεύει SHA-256 και μετονομάζει· σε ασυμφωνία διαγράφει το αρχείο
+        /// και ρίχνει <see cref="ChecksumMismatchException"/>. ΠΟΤΕ δεν εκτελεί τον installer. Αν δεν έρθει κανένα byte για
+        /// <paramref name="stallTimeout"/> (κολλημένη σύνδεση) ρίχνει <see cref="TimeoutException"/>· σε ΚΑΘΕ αποτυχία ή ακύρωση
+        /// (CancellationToken) το ημιτελές .part σβήνεται.</summary>
         public static async Task<string> DownloadVerifiedAsync(HttpClient http, ReleaseAsset asset, string expectedHex, string destDir,
-            IProgress<double>? progress = null, CancellationToken ct = default)
+            IProgress<double>? progress = null, CancellationToken ct = default, TimeSpan? stallTimeout = null)
         {
             if (!Uri.TryCreate(asset.Url, UriKind.Absolute, out var uri) || !SuiteCatalog.IsAllowedHost(uri))
                 throw new InvalidOperationException("download host not allowed");
@@ -187,35 +189,53 @@ namespace Kombos.Services
             Directory.CreateDirectory(destDir);
             var final = Path.Combine(destDir, safeName);
             var part = final + ".part";
+            var stall = stallTimeout ?? TimeSpan.FromSeconds(60);
 
-            using var req = new HttpRequestMessage(HttpMethod.Get, uri);
-            req.Headers.UserAgent.ParseAdd("Kombos");
-            using var resp = await http.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, ct);
-            resp.EnsureSuccessStatusCode();
-            if (!SuiteCatalog.IsAllowedHost(resp.RequestMessage?.RequestUri)) throw new InvalidOperationException("redirect host not allowed");
-
-            long total = resp.Content.Headers.ContentLength ?? asset.Size;
-            await using (var src = await resp.Content.ReadAsStreamAsync(ct))
-            await using (var dst = File.Create(part))
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            try
             {
-                var buf = new byte[81920]; int n; long done = 0;
-                while ((n = await src.ReadAsync(buf, ct)) > 0)
+                cts.CancelAfter(stall);
+                using var req = new HttpRequestMessage(HttpMethod.Get, uri);
+                req.Headers.UserAgent.ParseAdd("Kombos");
+                using var resp = await http.SendAsync(req, HttpCompletionOption.ResponseHeadersRead, cts.Token);
+                resp.EnsureSuccessStatusCode();
+                if (!SuiteCatalog.IsAllowedHost(resp.RequestMessage?.RequestUri)) throw new InvalidOperationException("redirect host not allowed");
+
+                long total = resp.Content.Headers.ContentLength ?? asset.Size;
+                await using (var src = await resp.Content.ReadAsStreamAsync(cts.Token))
+                await using (var dst = File.Create(part))
                 {
-                    await dst.WriteAsync(buf.AsMemory(0, n), ct);
-                    done += n;
-                    if (total > 0) progress?.Report((double)done / total);
+                    var buf = new byte[81920]; int n; long done = 0;
+                    while (true)
+                    {
+                        cts.CancelAfter(stall); // το χρονικό όριο ανανεώνεται με κάθε κομμάτι που φτάνει
+                        n = await src.ReadAsync(buf, cts.Token);
+                        if (n <= 0) break;
+                        await dst.WriteAsync(buf.AsMemory(0, n), cts.Token);
+                        done += n;
+                        if (total > 0) progress?.Report((double)done / total);
+                    }
                 }
+                var actual = Sha256Of(part);
+                if (!string.Equals(actual, expectedHex, StringComparison.OrdinalIgnoreCase))
+                    throw new ChecksumMismatchException(expectedHex, actual);
+                if (File.Exists(final)) File.Delete(final);
+                File.Move(part, final);
+                return final;
             }
-            var actual = Sha256Of(part);
-            if (!string.Equals(actual, expectedHex, StringComparison.OrdinalIgnoreCase))
+            catch (OperationCanceledException) when (!ct.IsCancellationRequested)
             {
-                try { File.Delete(part); } catch { }
-                throw new ChecksumMismatchException(expectedHex, actual);
+                TryDelete(part);
+                throw new TimeoutException($"no data received for {stall.TotalSeconds:0} s");
             }
-            if (File.Exists(final)) File.Delete(final);
-            File.Move(part, final);
-            return final;
+            catch
+            {
+                TryDelete(part); // αποτυχία, ακύρωση ή ασυμφωνία hash: ποτέ ημιτελές αρχείο στα Downloads
+                throw;
+            }
         }
+
+        private static void TryDelete(string path) { try { if (File.Exists(path)) File.Delete(path); } catch { } }
 
         /// <summary>Αναμενόμενος hash: πρώτα το αρχείο .sha256 του release, αλλιώς το πεδίο digest του asset. null = άγνωστος.</summary>
         public static async Task<string?> ResolveExpectedHashAsync(HttpClient http, LatestRelease rel, ReleaseAsset installer, string? checksumAssetName, CancellationToken ct = default)

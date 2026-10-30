@@ -4,6 +4,18 @@ All notable changes to Kombos, summarized here for GitHub. The full changelog - 
 languages (Greek, English, French, German) - is always available inside the app itself, via the Help panel's
 "Version history" tab.
 
+## v4.9.3 — Download robustness, safe launching
+
+**Fixed**
+- Showcase download could hang forever on a stalled connection (no timeout) — now a 60 s no-data timeout (renewed with every chunk) throws `TimeoutException`; the download also takes a `CancellationToken` and the card shows a **Cancel** button while downloading.
+- A failed, timed-out or cancelled download left a half-written `.part` file in Downloads — it is now always deleted. The "already downloading" guard is released in every case (success, failure, cancel), so pressing Download again works.
+- `explorer.exe` is started by its full path (`%WINDIR%\explorer.exe`) in the showcase and in the plugin scaffolder.
+- "Open" in the showcase only starts an existing, fully-qualified local `.exe` (otherwise a message, in all four languages).
+
+**Tests added**: stalled connection → TimeoutException and no `.part`; cancellation → OperationCanceledException and no `.part`; failed request leaves no `.part`; Cancel/AppNotFound strings in 4 languages (existing localisation test).
+
+**Not verified**: a real >1 GB or flaky-network download; the Cancel button was not clicked in the live UI (logic covered by tests).
+
 ## v4.9.2 — Real icons in the Opsis family, bug audit, installer branding, repo presentation
 
 **Added**

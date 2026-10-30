@@ -10,7 +10,7 @@
 
 #define MyAppName "Κόμβος"
 #define MyAppNameAscii "Kombos"
-#define MyAppVersion "4.9.2"
+#define MyAppVersion "4.9.3"
 #define MyAppPublisher "Kombos"
 #define MyAppExeName "Kombos.exe"
 #define MyPublishDir "..\publish"

@@ -809,7 +809,7 @@ namespace Kombos
                     ?? System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Kombos.exe");
                 var projectDir = PluginScaffolder.Scaffold(name, exePath);
                 ScaffoldResultText.Text = L.ScaffoldSuccess(projectDir);
-                System.Diagnostics.Process.Start("explorer.exe", projectDir);
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(MainWindow.ExplorerExe, $"\"{projectDir}\"") { UseShellExecute = true });
             }
             catch (Exception ex) { ScaffoldResultText.Text = L.SomethingWentWrong(ex.Message); }
         }

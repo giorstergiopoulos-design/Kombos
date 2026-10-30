@@ -24,6 +24,10 @@ namespace Kombos
         private static readonly HttpClient SuiteHttp = new() { Timeout = TimeSpan.FromSeconds(30) };
         private static readonly HttpClient SuiteDownloadHttp = ReleaseDownloader.CreateDownloadClient();
         private readonly HashSet<string> _suiteDownloading = new();
+        private readonly Dictionary<string, System.Threading.CancellationTokenSource> _suiteCts = new();
+
+        /// <summary>Πλήρης διαδρομή του explorer.exe από τον φάκελο Windows (όχι αναζήτηση στο PATH/τρέχοντα φάκελο).</summary>
+        internal static string ExplorerExe => System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe");
 
         private string _guideSeenVersion = "";
         private bool _guideDontShow;
@@ -255,7 +259,9 @@ namespace Kombos
             var buttons = new WrapPanel { Margin = new Thickness(0, 10, 0, 0) };
             if (info?.ExePath != null && !isSelf)
                 buttons.Children.Add(SuiteButton(SuiteStrings.Open, true, () => OpenSuiteApp(info.ExePath), SuiteStrings.Open + " " + app.Name));
-            if (info != null && (info.State == InstallState.NotInstalled && !isSelf || info.State == InstallState.UpdateAvailable))
+            if (_suiteDownloading.Contains(app.Id))
+                buttons.Children.Add(SuiteButton(SuiteStrings.Cancel, false, () => { if (_suiteCts.TryGetValue(app.Id, out var c)) c.Cancel(); }, SuiteStrings.Cancel + " " + app.Name));
+            else if (info != null && (info.State == InstallState.NotInstalled && !isSelf || info.State == InstallState.UpdateAvailable))
                 buttons.Children.Add(SuiteButton(info.State == InstallState.UpdateAvailable ? SuiteStrings.Update : SuiteStrings.Install, info.ExePath == null,
                     () => _ = InstallSuiteAppAsync(app), (info.State == InstallState.UpdateAvailable ? SuiteStrings.Update : SuiteStrings.Install) + " " + app.Name));
             buttons.Children.Add(SuiteButton(SuiteStrings.Details, false, () => OpenExternalUrl(app.RepoUrl), SuiteStrings.Details + " " + app.Name));
@@ -325,6 +331,12 @@ namespace Kombos
 
         private void OpenSuiteApp(string exe)
         {
+            // Μόνο υπαρκτό, τοπικό .exe με πλήρη διαδρομή - ποτέ URL ή σχετική/αυθαίρετη διαδρομή από δεδομένα.
+            if (!System.IO.Path.IsPathFullyQualified(exe) || !exe.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) || !System.IO.File.Exists(exe))
+            {
+                MessageBox.Show(this, SuiteStrings.AppNotFound(exe), "Kombos");
+                return;
+            }
             try { Process.Start(new ProcessStartInfo(exe) { UseShellExecute = true, WorkingDirectory = System.IO.Path.GetDirectoryName(exe) ?? "" }); }
             catch (Exception ex) { MessageBox.Show(this, ex.Message, "Kombos"); }
         }
@@ -342,6 +354,8 @@ namespace Kombos
         {
             var releasePage = $"{app.RepoUrl}/releases/latest";
             if (!_suiteDownloading.Add(app.Id)) return; // διπλό κλικ: ήδη σε εξέλιξη
+            var cts = new System.Threading.CancellationTokenSource();
+            _suiteCts[app.Id] = cts;
             try
             {
                 var rel = _suiteLatest.GetValueOrDefault(app.Id) ?? await ReleaseDownloader.GetLatestAsync(SuiteHttp, app.Repo);
@@ -374,23 +388,28 @@ namespace Kombos
                 string path;
                 _suiteStatus[app.Id] = SuiteStrings.Downloading(0);
                 RenderSuiteCards(null);
-                try { path = await ReleaseDownloader.DownloadVerifiedAsync(SuiteDownloadHttp, asset, hash, downloads, progress); }
+                try { path = await ReleaseDownloader.DownloadVerifiedAsync(SuiteDownloadHttp, asset, hash, downloads, progress, cts.Token); }
                 catch (ChecksumMismatchException)
                 {
                     _suiteStatus.Remove(app.Id);
                     MessageBox.Show(this, SuiteStrings.ChecksumRefused, app.Name, MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
+                catch (OperationCanceledException)
+                {
+                    _suiteStatus.Remove(app.Id); // ακυρώθηκε από τον χρήστη: σιωπηλά, το .part έχει ήδη σβηστεί
+                    return;
+                }
                 _suiteStatus.Remove(app.Id);
                 MessageBox.Show(this, SuiteStrings.DownloadVerified(path), app.Name, MessageBoxButton.OK, MessageBoxImage.Information);
-                try { Process.Start(new ProcessStartInfo("explorer.exe", $"/select,\"{path}\"") { UseShellExecute = true }); } catch { }
+                try { Process.Start(new ProcessStartInfo(ExplorerExe, $"/select,\"{path}\"") { UseShellExecute = true }); } catch { }
             }
             catch (Exception ex)
             {
                 _suiteStatus.Remove(app.Id);
                 MessageBox.Show(this, SuiteStrings.DownloadFailed(ex.Message), app.Name, MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-            finally { _suiteDownloading.Remove(app.Id); _ = RefreshSuiteAsync(); }
+            finally { _suiteDownloading.Remove(app.Id); _suiteCts.Remove(app.Id); cts.Dispose(); _ = RefreshSuiteAsync(); }
         }
 
         // ---------- Ειδοποίηση νέας έκδοσης ----------
